@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — LUPI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Raleway:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+  <!-- Auth gate shown while checking, replaced once confirmed admin -->
+  <div id="authGate" class="auth-gate">
+    <div class="auth-gate-logo">LUPI</div>
+    <p>Verifying access…</p>
+  </div>
+
+  <!-- Main admin shell (hidden until auth confirmed) -->
+  <div id="adminShell" class="admin-shell" style="display:none">
+
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="admin-logo">
+        LUPI <span>Admin Panel</span>
+      </div>
+      <div class="admin-header-right">
+        <a href="index.html" class="back-to-site">← View Site</a>
+        <div class="admin-user">Signed in as <strong id="adminUserName"></strong></div>
+        <button class="btn-logout" id="logoutBtn">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-label">Products</div>
+      <button class="sidebar-item active" data-filter="all">
+        All Products <span class="sidebar-count" id="cnt-all">—</span>
+      </button>
+      <div class="sidebar-divider"></div>
+      <button class="sidebar-item" data-filter="perfume">
+        Perfumes <span class="sidebar-count" id="cnt-perfume">—</span>
+      </button>
+      <button class="sidebar-item" data-filter="new_release">
+        New Releases <span class="sidebar-count" id="cnt-new_release">—</span>
+      </button>
+      <button class="sidebar-item" data-filter="handsoap">
+        Hand Soap <span class="sidebar-count" id="cnt-handsoap">—</span>
+      </button>
+      <button class="sidebar-item" data-filter="roomspray">
+        Room Sprays <span class="sidebar-count" id="cnt-roomspray">—</span>
+      </button>
+      <button class="sidebar-item" data-filter="candle">
+        Candles <span class="sidebar-count" id="cnt-candle">—</span>
+      </button>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main">
+      <div class="admin-main-header">
+        <h1 class="admin-title" id="mainTitle">All <em>Products</em></h1>
+        <button class="btn-add" id="addProductBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Product
+        </button>
+      </div>
+      <div id="productList" class="product-list">
+        <div class="admin-loading">Loading products…</div>
+      </div>
+    </main>
+
+  </div><!-- /adminShell -->
+
+
+  <!-- Edit / Add slide panel -->
+  <div class="edit-overlay" id="editOverlay">
+    <div class="edit-panel" id="editPanel">
+      <div class="edit-panel-header">
+        <div class="edit-panel-title" id="editPanelTitle">Edit <em>Product</em></div>
+        <button class="btn-close-panel" id="closePanelBtn" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="edit-panel-body">
+
+        <!-- Visibility toggle -->
+        <div class="toggle-row">
+          <span class="toggle-label">Visible on site</span>
+          <label class="toggle">
+            <input type="checkbox" id="fieldVisible" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- Core fields -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldName">Product Name</label>
+            <input type="text" id="fieldName" class="form-input" placeholder="e.g. Lumière Dorée">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldType">Type</label>
+            <select id="fieldType" class="form-select">
+              <option value="perfume">Perfume</option>
+              <option value="new_release">New Release</option>
+              <option value="handsoap">Hand Soap</option>
+              <option value="roomspray">Room Spray</option>
+              <option value="candle">Candle</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldPrice">Price (display)</label>
+            <input type="text" id="fieldPrice" class="form-input" placeholder="€ 289">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldPriceNum">Price (numeric)</label>
+            <input type="number" id="fieldPriceNum" class="form-input" placeholder="289" min="0" step="0.01">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldCategory">Category</label>
+            <input type="text" id="fieldCategory" class="form-input" placeholder="women / men / unisex">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fieldBadge">Badge</label>
+            <input type="text" id="fieldBadge" class="form-input" placeholder="New / Limited / Best Seller">
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label" for="fieldCategoryLabel">Category Label</label>
+            <input type="text" id="fieldCategoryLabel" class="form-input" placeholder="Women · Floral Oriental">
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-section-title">Description</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label" for="fieldDescription">Description</label>
+            <textarea id="fieldDescription" class="form-textarea" rows="4" placeholder="Fragrance description…"></textarea>
+          </div>
+        </div>
+
+        <!-- Fragrance Notes -->
+        <div class="form-section-title">Fragrance Notes</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label" for="fieldTopNotes">Top Notes</label>
+            <input type="text" id="fieldTopNotes" class="form-input" placeholder="Bergamot, Pink Pepper, Mandarin">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label" for="fieldHeartNotes">Heart Notes</label>
+            <input type="text" id="fieldHeartNotes" class="form-input" placeholder="Rose, Jasmine, Peony">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label" for="fieldBaseNotes">Base Notes</label>
+            <input type="text" id="fieldBaseNotes" class="form-input" placeholder="Amber, Sandalwood, Musk">
+          </div>
+        </div>
+
+        <!-- Visual -->
+        <div class="form-section-title">Visual</div>
+        <div class="form-color-row">
+          <div class="form-group">
+            <label class="form-label">Accent Color</label>
+            <div class="color-preview">
+              <div class="color-swatch" id="colorSwatch"></div>
+              <input type="text" id="fieldColor" class="form-input" placeholder="#C9A96E">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Background Color</label>
+            <div class="color-preview">
+              <div class="color-swatch" id="bgSwatch"></div>
+              <input type="text" id="fieldBg" class="form-input" placeholder="#110e04">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label" for="fieldReleaseDate">Release Date</label>
+            <input type="text" id="fieldReleaseDate" class="form-input" placeholder="Jun 2026">
+          </div>
+        </div>
+
+        <!-- Image upload -->
+        <div class="form-section-title">Product Image</div>
+        <div id="imagePreviewWrap"></div>
+        <div class="image-upload-area" id="imageUploadArea">
+          <input type="file" id="imageFile" accept="image/*">
+          <div class="image-upload-label">
+            <strong>Click to upload</strong> or drag &amp; drop<br>
+            <span style="font-size:0.62rem;color:var(--text-dim)">PNG, JPG, WEBP — max 5MB</span>
+          </div>
+        </div>
+        <div id="uploadProgress" class="upload-progress" style="display:none"></div>
+
+        <!-- Sort order -->
+        <div class="form-section-title">Display Order</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="fieldSortOrder">Sort Order</label>
+            <input type="number" id="fieldSortOrder" class="form-input" placeholder="0" min="0">
+          </div>
+          <div></div>
+        </div>
+
+      </div><!-- /edit-panel-body -->
+
+      <div class="edit-panel-footer">
+        <button class="btn-danger" id="deleteProductBtn" style="margin-right:auto;display:none">Delete Product</button>
+        <button class="btn-ghost" id="cancelEditBtn">Cancel</button>
+        <button class="btn-primary" id="saveProductBtn">Save Changes</button>
+      </div>
+    </div><!-- /edit-panel -->
+  </div><!-- /edit-overlay -->
+
+
+  <!-- Confirm delete dialog -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <h3>Delete Product?</h3>
+      <p id="confirmText">This action cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn-ghost" id="confirmCancel">Cancel</button>
+        <button class="btn-danger" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/lupi-db.js"></script>
+
+  <script>
+  'use strict';
+
+  /* ── Constants ────────────────────────────────────────────── */
+  const TYPE_LABELS = {
+    perfume:     'Perfume',
+    new_release: 'New Release',
+    handsoap:    'Hand Soap',
+    roomspray:   'Room Spray',
+    candle:      'Candle',
+  };
+
+  const SECTION_TITLES = {
+    all:         'All <em>Products</em>',
+    perfume:     'Perfumes',
+    new_release: 'New <em>Releases</em>',
+    handsoap:    'Hand <em>Soap</em>',
+    roomspray:   'Room <em>Sprays</em>',
+    candle:      'Candles',
+  };
+
+  /* ── State ────────────────────────────────────────────────── */
+  let _products    = [];
+  let _filter      = 'all';
+  let _editingId   = null; // null = adding new
+  let _pendingDeleteId = null;
+  const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ── Auth guard ───────────────────────────────────────────── */
+  async function checkAuth() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session?.user || session.user.app_metadata?.role !== 'admin') {
+      window.location.replace('index.html');
+      return false;
+    }
+    document.getElementById('adminUserName').textContent =
+      session.user.user_metadata?.name || session.user.email;
+    return true;
+  }
+
+  /* ── Toast ────────────────────────────────────────────────── */
+  function toast(msg, type = '') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(() => el.remove(), 2800);
+  }
+
+  /* ── Load & render products ───────────────────────────────── */
+  async function loadProducts() {
+    try {
+      _products = await LupiDB.fetchAllAdmin();
+      renderAll();
+    } catch (e) {
+      document.getElementById('productList').innerHTML =
+        '<div class="admin-loading">Failed to load products. Check Supabase connection.</div>';
+    }
+  }
+
+  function filtered() {
+    if (_filter === 'all') return _products;
+    return _products.filter(p => p.type === _filter);
+  }
+
+  function updateCounts() {
+    const types = ['perfume', 'new_release', 'handsoap', 'roomspray', 'candle'];
+    document.getElementById('cnt-all').textContent = _products.length;
+    types.forEach(t => {
+      const el = document.getElementById(`cnt-${t}`);
+      if (el) el.textContent = _products.filter(p => p.type === t).length;
+    });
+  }
+
+  function renderAll() {
+    updateCounts();
+    const list  = document.getElementById('productList');
+    const items = filtered();
+
+    if (!items.length) {
+      list.innerHTML = `<div class="admin-empty">
+        <div class="admin-empty-icon">◈</div>
+        <p>No products in this category yet.</p>
+      </div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(p => {
+      const thumb = p.image_url
+        ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">`
+        : `<svg viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:48px;width:28px">
+             ${p.bottle_svg || '<rect x="35" y="20" width="30" height="120" rx="6" fill="rgba(201,169,110,0.2)"/>'}
+           </svg>`;
+
+      const badge = p.badge
+        ? `<span class="product-row-badge">${p.badge}</span>`
+        : '';
+
+      return `
+        <div class="product-row ${p.visible ? '' : 'hidden-product'}" data-id="${p.id}">
+          <div class="product-row-thumb">${thumb}</div>
+          <div class="product-row-info">
+            <div class="product-row-name">${p.name}${badge}</div>
+            <div class="product-row-meta">${TYPE_LABELS[p.type] || p.type} · ${p.category_label || p.category || '—'}</div>
+          </div>
+          <div class="product-row-price">${p.price}</div>
+          <div class="product-row-actions">
+            <button class="btn-row btn-row-edit"   data-action="edit"   data-id="${p.id}">Edit</button>
+            <button class="btn-row btn-row-hide"   data-action="toggle" data-id="${p.id}">${p.visible ? 'Hide' : 'Show'}</button>
+            <button class="btn-row btn-row-delete" data-action="delete" data-id="${p.id}">Delete</button>
+          </div>
+          <div class="product-row-visibility ${p.visible ? 'visible-dot' : 'invisible-dot'}"></div>
+        </div>`;
+    }).join('');
+
+    /* Event delegation */
+    list.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const { action, id } = btn.dataset;
+        if (action === 'edit')   openEdit(id);
+        if (action === 'toggle') toggleVisibility(id);
+        if (action === 'delete') confirmDelete(id);
+      });
+    });
+  }
+
+  /* ── Sidebar filter ───────────────────────────────────────── */
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _filter = btn.dataset.filter;
+      document.getElementById('mainTitle').innerHTML =
+        SECTION_TITLES[_filter] || `<em>${_filter}</em>`;
+      renderAll();
+    });
+  });
+
+  /* ── Toggle visibility ────────────────────────────────────── */
+  async function toggleVisibility(id) {
+    const p = _products.find(x => x.id === id);
+    if (!p) return;
+    try {
+      await LupiDB.setVisible(id, !p.visible);
+      p.visible = !p.visible;
+      renderAll();
+      toast(p.visible ? 'Product is now visible.' : 'Product hidden from site.');
+    } catch (e) {
+      toast('Failed to update visibility.', 'error');
+    }
+  }
+
+  /* ── Confirm delete ───────────────────────────────────────── */
+  function confirmDelete(id) {
+    const p = _products.find(x => x.id === id);
+    if (!p) return;
+    _pendingDeleteId = id;
+    document.getElementById('confirmText').textContent =
+      `"${p.name}" will be permanently removed.`;
+    document.getElementById('confirmOverlay').classList.add('open');
+  }
+
+  document.getElementById('confirmCancel').addEventListener('click', () => {
+    document.getElementById('confirmOverlay').classList.remove('open');
+    _pendingDeleteId = null;
+  });
+
+  document.getElementById('confirmDelete').addEventListener('click', async () => {
+    if (!_pendingDeleteId) return;
+    document.getElementById('confirmOverlay').classList.remove('open');
+    try {
+      await LupiDB.remove(_pendingDeleteId);
+      _products = _products.filter(p => p.id !== _pendingDeleteId);
+      _pendingDeleteId = null;
+      closePanel();
+      renderAll();
+      toast('Product deleted.', 'success');
+    } catch (e) {
+      toast('Delete failed: ' + e.message, 'error');
+      _pendingDeleteId = null;
+    }
+  });
+
+  /* ── Edit panel ───────────────────────────────────────────── */
+  function openEdit(id) {
+    _editingId = id;
+    const p = _products.find(x => x.id === id);
+    if (!p) return;
+
+    document.getElementById('editPanelTitle').innerHTML = `Edit <em>${p.name}</em>`;
+    document.getElementById('deleteProductBtn').style.display = 'inline-flex';
+    document.getElementById('saveProductBtn').textContent = 'Save Changes';
+
+    fillForm(p);
+    openPanel();
+  }
+
+  function openAdd() {
+    _editingId = null;
+    document.getElementById('editPanelTitle').innerHTML = 'Add <em>Product</em>';
+    document.getElementById('deleteProductBtn').style.display = 'none';
+    document.getElementById('saveProductBtn').textContent = 'Add Product';
+    fillForm({
+      visible: true, type: _filter !== 'all' ? _filter : 'perfume',
+      sort_order: _products.length,
+    });
+    openPanel();
+  }
+
+  function openPanel() {
+    document.getElementById('editOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePanel() {
+    document.getElementById('editOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    _editingId = null;
+  }
+
+  /* ── Fill / read form ─────────────────────────────────────── */
+  function fillForm(p) {
+    document.getElementById('fieldVisible').checked    = p.visible ?? true;
+    document.getElementById('fieldName').value         = p.name         || '';
+    document.getElementById('fieldType').value         = p.type         || 'perfume';
+    document.getElementById('fieldPrice').value        = p.price        || '';
+    document.getElementById('fieldPriceNum').value     = p.price_num    || '';
+    document.getElementById('fieldCategory').value     = p.category     || '';
+    document.getElementById('fieldBadge').value        = p.badge        || '';
+    document.getElementById('fieldCategoryLabel').value= p.category_label || '';
+    document.getElementById('fieldDescription').value  = p.description  || '';
+    document.getElementById('fieldTopNotes').value     = p.top_notes    || '';
+    document.getElementById('fieldHeartNotes').value   = p.heart_notes  || '';
+    document.getElementById('fieldBaseNotes').value    = p.base_notes   || '';
+    document.getElementById('fieldColor').value        = p.color        || '';
+    document.getElementById('fieldBg').value           = p.bg           || '';
+    document.getElementById('fieldReleaseDate').value  = p.release_date || '';
+    document.getElementById('fieldSortOrder').value    = p.sort_order   ?? 0;
+    document.getElementById('imageFile').value         = '';
+    document.getElementById('uploadProgress').style.display = 'none';
+
+    updateSwatches();
+    renderImagePreview(p);
+  }
+
+  function readForm() {
+    return {
+      visible:        document.getElementById('fieldVisible').checked,
+      name:           document.getElementById('fieldName').value.trim(),
+      type:           document.getElementById('fieldType').value,
+      price:          document.getElementById('fieldPrice').value.trim(),
+      price_num:      parseFloat(document.getElementById('fieldPriceNum').value) || 0,
+      category:       document.getElementById('fieldCategory').value.trim(),
+      badge:          document.getElementById('fieldBadge').value.trim() || null,
+      category_label: document.getElementById('fieldCategoryLabel').value.trim(),
+      description:    document.getElementById('fieldDescription').value.trim(),
+      top_notes:      document.getElementById('fieldTopNotes').value.trim(),
+      heart_notes:    document.getElementById('fieldHeartNotes').value.trim(),
+      base_notes:     document.getElementById('fieldBaseNotes').value.trim(),
+      color:          document.getElementById('fieldColor').value.trim(),
+      bg:             document.getElementById('fieldBg').value.trim(),
+      release_date:   document.getElementById('fieldReleaseDate').value.trim() || null,
+      sort_order:     parseInt(document.getElementById('fieldSortOrder').value) || 0,
+    };
+  }
+
+  /* ── Color swatches ───────────────────────────────────────── */
+  function updateSwatches() {
+    const c = document.getElementById('fieldColor').value;
+    const b = document.getElementById('fieldBg').value;
+    document.getElementById('colorSwatch').style.background = c || 'transparent';
+    document.getElementById('bgSwatch').style.background    = b || 'transparent';
+  }
+  document.getElementById('fieldColor').addEventListener('input', updateSwatches);
+  document.getElementById('fieldBg').addEventListener('input', updateSwatches);
+
+  /* ── Image preview ────────────────────────────────────────── */
+  function renderImagePreview(p) {
+    const wrap = document.getElementById('imagePreviewWrap');
+    if (p.image_url) {
+      wrap.innerHTML = `
+        <img src="${p.image_url}" alt="Current image" class="image-current">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <span style="font-size:0.65rem;color:var(--text-muted);letter-spacing:.06em">Current image</span>
+          <button class="btn-remove-image" id="removeImageBtn">Remove</button>
+        </div>`;
+      document.getElementById('removeImageBtn')?.addEventListener('click', async () => {
+        if (!_editingId) return;
+        try {
+          await LupiDB.upsert({ id: _editingId, image_url: null });
+          const p = _products.find(x => x.id === _editingId);
+          if (p) p.image_url = null;
+          renderImagePreview(p || {});
+          renderAll();
+          toast('Image removed.');
+        } catch (e) {
+          toast('Failed to remove image.', 'error');
+        }
+      });
+    } else if (p.bottle_svg) {
+      wrap.innerHTML = `
+        <div class="image-current-svg">
+          <svg viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg"
+               style="--b-color:${p.color || '#C9A96E'}">
+            ${p.bottle_svg}
+          </svg>
+        </div>
+        <p style="font-size:0.62rem;color:var(--text-dim);margin-bottom:12px;letter-spacing:.06em">
+          SVG placeholder · Upload an image to replace
+        </p>`;
+    } else {
+      wrap.innerHTML = '';
+    }
+  }
+
+  /* ── Image upload ─────────────────────────────────────────── */
+  document.getElementById('imageFile').addEventListener('change', async e => {
+    const file = e.target.files?.[0];
+    if (!file || !_editingId) return;
+    if (file.size > 5 * 1024 * 1024) { toast('File too large (max 5 MB).', 'error'); return; }
+
+    const prog = document.getElementById('uploadProgress');
+    prog.textContent = 'Uploading…';
+    prog.style.display = 'block';
+
+    try {
+      const url = await LupiDB.uploadImage(file, _editingId);
+      await LupiDB.upsert({ id: _editingId, image_url: url });
+      const p = _products.find(x => x.id === _editingId);
+      if (p) p.image_url = url;
+      prog.style.display = 'none';
+      renderImagePreview(p || { image_url: url });
+      renderAll();
+      toast('Image uploaded.', 'success');
+    } catch (err) {
+      prog.textContent = 'Upload failed: ' + err.message;
+      toast('Upload failed.', 'error');
+    }
+  });
+
+  /* ── Save product ─────────────────────────────────────────── */
+  document.getElementById('saveProductBtn').addEventListener('click', async () => {
+    const data  = readForm();
+    const btn   = document.getElementById('saveProductBtn');
+
+    if (!data.name) { toast('Product name is required.', 'error'); return; }
+    if (!data.price) { toast('Price is required.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+
+    try {
+      if (_editingId) {
+        /* Update existing */
+        const existing = _products.find(p => p.id === _editingId);
+        const updated  = { ...existing, ...data };
+        await LupiDB.upsert(updated);
+        const idx = _products.findIndex(p => p.id === _editingId);
+        if (idx >= 0) _products[idx] = updated;
+        toast('Product updated.', 'success');
+      } else {
+        /* Add new — generate a simple id */
+        const prefix = data.type.slice(0, 2);
+        const newId  = `${prefix}-${Date.now()}`;
+        const newProduct = { id: newId, ...data, bottle_svg: null, image_url: null, created_at: new Date().toISOString() };
+        await LupiDB.upsert(newProduct);
+        _products.push(newProduct);
+        toast('Product added.', 'success');
+      }
+      renderAll();
+      closePanel();
+    } catch (err) {
+      toast('Save failed: ' + err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = _editingId ? 'Save Changes' : 'Add Product';
+    }
+  });
+
+  /* ── Delete from panel ────────────────────────────────────── */
+  document.getElementById('deleteProductBtn').addEventListener('click', () => {
+    if (_editingId) confirmDelete(_editingId);
+  });
+
+  /* ── Panel close handlers ─────────────────────────────────── */
+  document.getElementById('closePanelBtn').addEventListener('click', closePanel);
+  document.getElementById('cancelEditBtn').addEventListener('click', closePanel);
+  document.getElementById('addProductBtn').addEventListener('click', openAdd);
+  document.getElementById('editOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('editOverlay')) closePanel();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+  /* ── Logout ───────────────────────────────────────────────── */
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await _sb.auth.signOut();
+    window.location.replace('index.html');
+  });
+
+  /* ── Boot ─────────────────────────────────────────────────── */
+  (async () => {
+    const ok = await checkAuth();
+    if (!ok) return;
+    document.getElementById('authGate').style.display  = 'none';
+    document.getElementById('adminShell').style.display = 'grid';
+    await loadProducts();
+  })();
+  </script>
+
+</body>
+</html>

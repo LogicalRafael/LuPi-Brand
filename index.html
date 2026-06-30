@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Raleway:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/lupi-features.css">
 </head>
 <body>
 
@@ -29,14 +30,38 @@
       </a>
 
       <ul class="nav-links" id="navLinks">
-        <li><a href="#home"     class="nav-link active">Home</a></li>
-        <li><a href="#about"    class="nav-link">About</a></li>
-        <li><a href="#products" class="nav-link">Collection</a></li>
-        <li><a href="#contact"  class="nav-link">Contact</a></li>
+        <li><a href="#home"              class="nav-link active" data-i18n="nav.home">Home</a></li>
+        <li><a href="#about"             class="nav-link"        data-i18n="nav.about">About</a></li>
+        <li><a href="#products"          class="nav-link"        data-i18n="nav.collection">Collection</a></li>
+        <li><a href="#contact"           class="nav-link"        data-i18n="nav.contact">Contact</a></li>
+        <li><a href="new-releases.html"  class="nav-link"        data-i18n="nav.newReleases">New Releases</a></li>
       </ul>
 
       <div class="nav-actions">
-        <button class="cart-btn" id="cartBtn" aria-label="Shopping cart">
+        <!-- Language selector -->
+        <div class="lang-selector" id="langDropdown">
+          <button class="lang-trigger" id="langTrigger" aria-label="Select language">
+            <span id="langCurrent">EN</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lang-menu">
+            <button class="lang-option active" data-lang="en">English</button>
+            <button class="lang-option"        data-lang="pt">Português</button>
+            <button class="lang-option"        data-lang="es">Español</button>
+            <button class="lang-option"        data-lang="fr">Français</button>
+          </div>
+        </div>
+
+        <!-- Account button -->
+        <button class="cart-btn" id="authNavBtn" aria-label="Account" data-i18n-title="nav.login">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </button>
+
+        <!-- Cart button -->
+        <button class="cart-btn" id="cartBtn" aria-label="Shopping cart" data-i18n-title="nav.cart">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
             <line x1="3" y1="6" x2="21" y2="6"/>
@@ -44,6 +69,7 @@
           </svg>
           <span class="cart-count" id="cartCount">0</span>
         </button>
+
         <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
           <span></span><span></span><span></span>
         </button>
@@ -84,8 +110,8 @@
         </p>
 
         <div class="hero-cta">
-          <a href="#products" class="btn btn-primary">Explore Collection</a>
-          <a href="#about"    class="btn btn-outline">Discover Our Story</a>
+          <a href="#products" class="btn btn-primary" data-i18n="hero.explore">Explore Collection</a>
+          <a href="#about"    class="btn btn-outline" data-i18n="hero.story">Discover Our Story</a>
         </div>
 
         <div class="hero-scroll-hint">
@@ -204,7 +230,7 @@
             </div>
           </div>
 
-          <a href="#products" class="btn btn-primary reveal reveal-delay-4">Explore the Collection</a>
+          <a href="#products" class="btn btn-primary reveal reveal-delay-4" data-i18n="hero.exploreCollection">Explore the Collection</a>
         </div>
 
       </div>
@@ -225,329 +251,45 @@
         <p class="section-subtitle">Each scent is a chapter. Find yours.</p>
       </div>
 
-      <!-- Filter tabs — REPLACE: Add/remove categories to match your product range -->
-      <div class="product-filters reveal">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="women">Women</button>
-        <button class="filter-btn" data-filter="men">Men</button>
-        <button class="filter-btn" data-filter="unisex">Unisex</button>
-        <button class="filter-btn" data-filter="limited">Limited Edition</button>
+      <!-- Category tabs — switches between Perfumes / Hand Soap / Room Sprays / Candles -->
+      <div class="cat-tabs reveal" id="categoryTabs">
+        <button class="cat-tab active" data-cat="perfumes"   data-i18n="categories.perfumes">Perfumes</button>
+        <button class="cat-tab"        data-cat="handsoap"   data-i18n="categories.handSoap">Hand Soap</button>
+        <button class="cat-tab"        data-cat="roomsprays" data-i18n="categories.roomSprays">Room Sprays</button>
+        <button class="cat-tab"        data-cat="candles"    data-i18n="categories.candles">Candles</button>
       </div>
 
-      <!-- ================================================
-           PRODUCTS GRID
-           Each .product-card contains all replaceable data.
-           Instructions for each product are in the comments.
-      ================================================ -->
-      <div class="products-grid" id="productsGrid">
+      <!-- Perfumes panel — wraps the existing gender filter + product grid -->
+      <div class="cat-panel" id="panel-perfumes">
 
+      <!-- Filter tabs — REPLACE: Add/remove categories to match your product range -->
+      <div class="product-filters reveal">
+        <button class="filter-btn active" data-filter="all"     data-i18n="products.filterAll">All</button>
+        <button class="filter-btn"        data-filter="women"   data-i18n="products.filterWomen">Women</button>
+        <button class="filter-btn"        data-filter="men"     data-i18n="products.filterMen">Men</button>
+        <button class="filter-btn"        data-filter="unisex"  data-i18n="products.filterUnisex">Unisex</button>
+        <button class="filter-btn"        data-filter="limited" data-i18n="products.filterLimited">Limited Edition</button>
+      </div>
 
-        <!-- ────────────────────────────────────────────
-             PRODUCT 1 — Lumière Dorée
-             To customize:
-               1. Update data-category (women / men / unisex / limited)
-               2. Update data-name, data-price, data-description
-               3. Update data-top-notes, data-heart-notes, data-base-notes
-               4. Replace the .product-img-placeholder div with:
-                  <img src="your-image.jpg" alt="Product name">
-               5. Update .product-category-tag text
-               6. Update .product-name, .product-desc, .product-price
-               7. Change or remove the .product-badge
-        ──────────────────────────────────────────── -->
-        <div class="product-card reveal"
-             data-category="women"
-             data-product-id="1"
-             data-name="Lumière Dorée"
-             data-price="€ 289"
-             data-description="An opulent floral oriental that opens with sparkling bergamot and pink pepper, unfurling into a heart of damascene rose and jasmine sambac, resting on a warm bed of amber and precious woods."
-             data-top-notes="Bergamot, Pink Pepper, Mandarin"
-             data-heart-notes="Damascene Rose, Jasmine Sambac, Peony"
-             data-base-notes="Amber, Sandalwood, White Musk, Vanilla">
+      <!-- Products rendered dynamically from Supabase (or fallback data) by main.js -->
+      <div class="products-grid" id="productsGrid"></div>
+      </div><!-- /panel-perfumes -->
 
-          <div class="product-badge badge-bestseller">Best Seller</div>
+      <!-- Hand Soap panel — rendered from CATEGORY_PRODUCTS.handsoap in main.js -->
+      <div class="cat-panel cat-panel-hidden" id="panel-handsoap">
+        <div class="products-grid" id="grid-handsoap"></div>
+      </div>
 
-          <div class="product-image-wrap">
-            <!-- REPLACE: Swap this div with <img src="…" alt="Lumière Dorée"> -->
-            <div class="product-img-placeholder" style="--b-color: #C9A96E; --b-bg: #110e04;">
-              <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="42" y="6" width="16" height="5" rx="2.5" fill="var(--b-color)" opacity="0.8"/>
-                <rect x="38" y="11" width="24" height="16" rx="4" fill="var(--b-color)" opacity="0.9"/>
-                <rect x="43" y="27" width="14" height="14" rx="2" fill="var(--b-color)" opacity="0.7"/>
-                <path d="M28 41 C25 52 22 66 20 82 L80 82 C78 66 75 52 72 41 Z" fill="var(--b-color)" opacity="0.15"/>
-                <rect x="20" y="82" width="60" height="72" rx="5" fill="var(--b-color)" opacity="0.12"/>
-                <rect x="26" y="88" width="8" height="56" rx="4" fill="white" opacity="0.2"/>
-                <rect x="32" y="100" width="36" height="38" rx="2" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.6"/>
-                <line x1="38" y1="114" x2="62" y2="114" stroke="var(--b-color)" stroke-width="0.6" opacity="0.5"/>
-                <line x1="40" y1="124" x2="60" y2="124" stroke="var(--b-color)" stroke-width="0.4" opacity="0.35"/>
-                <rect x="20" y="154" width="60" height="5" rx="2.5" fill="var(--b-color)" opacity="0.3"/>
-                <rect x="20" y="41" width="60" height="118" rx="5" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.28"/>
-              </svg>
-            </div>
-            <!-- END REPLACE -->
-            <div class="product-img-overlay"></div>
-          </div>
+      <!-- Room Sprays panel -->
+      <div class="cat-panel cat-panel-hidden" id="panel-roomsprays">
+        <div class="products-grid" id="grid-roomsprays"></div>
+      </div>
 
-          <div class="product-info">
-            <div class="product-category-tag">Women · Floral Oriental</div>
-            <h3 class="product-name">Lumière Dorée</h3>
-            <p class="product-desc">Opulent florals entwined with golden amber and warm precious woods.</p>
-            <div class="product-footer">
-              <span class="product-price">€ 289</span>
-              <button class="btn-view-detail" data-product-id="1">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- END PRODUCT 1 -->
+      <!-- Candles panel -->
+      <div class="cat-panel cat-panel-hidden" id="panel-candles">
+        <div class="products-grid" id="grid-candles"></div>
+      </div>
 
-
-        <!-- ────────────────────────────────────────────
-             PRODUCT 2 — Nuit Velours
-        ──────────────────────────────────────────── -->
-        <div class="product-card reveal reveal-delay-1"
-             data-category="women"
-             data-product-id="2"
-             data-name="Nuit Velours"
-             data-price="€ 245"
-             data-description="A modern woody floral of seductive depth. Creamy magnolia and violet petals weave through dark patchouli and cedarwood, leaving an intimate, velvety trail that lingers long into the night."
-             data-top-notes="Violet Leaf, Black Currant, Green Fig"
-             data-heart-notes="Magnolia, Tuberose, Iris"
-             data-base-notes="Dark Patchouli, Cedarwood, Vetiver, Musk">
-
-          <div class="product-badge badge-new">New</div>
-
-          <div class="product-image-wrap">
-            <!-- REPLACE: Swap with <img src="…" alt="Nuit Velours"> -->
-            <div class="product-img-placeholder" style="--b-color: #9B7FB6; --b-bg: #0c080f;">
-              <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="44" y="6" width="12" height="5" rx="2.5" fill="var(--b-color)" opacity="0.8"/>
-                <rect x="36" y="11" width="28" height="18" rx="5" fill="var(--b-color)" opacity="0.9"/>
-                <rect x="42" y="29" width="16" height="12" rx="2" fill="var(--b-color)" opacity="0.7"/>
-                <path d="M22 41 C19 54 17 70 15 88 L85 88 C83 70 81 54 78 41 Z" fill="var(--b-color)" opacity="0.14"/>
-                <rect x="15" y="88" width="70" height="68" rx="8" fill="var(--b-color)" opacity="0.12"/>
-                <rect x="22" y="94" width="9" height="54" rx="4.5" fill="white" opacity="0.18"/>
-                <rect x="28" y="104" width="44" height="36" rx="3" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.6"/>
-                <line x1="36" y1="118" x2="64" y2="118" stroke="var(--b-color)" stroke-width="0.6" opacity="0.5"/>
-                <line x1="38" y1="128" x2="62" y2="128" stroke="var(--b-color)" stroke-width="0.4" opacity="0.3"/>
-                <rect x="15" y="156" width="70" height="5" rx="2.5" fill="var(--b-color)" opacity="0.28"/>
-                <rect x="15" y="41" width="70" height="120" rx="8" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.28"/>
-              </svg>
-            </div>
-            <!-- END REPLACE -->
-            <div class="product-img-overlay"></div>
-          </div>
-
-          <div class="product-info">
-            <div class="product-category-tag">Women · Woody Floral</div>
-            <h3 class="product-name">Nuit Velours</h3>
-            <p class="product-desc">Creamy florals over dark, sensual woods — an evening fragrance of seductive depth.</p>
-            <div class="product-footer">
-              <span class="product-price">€ 245</span>
-              <button class="btn-view-detail" data-product-id="2">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- END PRODUCT 2 -->
-
-
-        <!-- ────────────────────────────────────────────
-             PRODUCT 3 — Encens Royal
-        ──────────────────────────────────────────── -->
-        <div class="product-card reveal reveal-delay-2"
-             data-category="men limited"
-             data-product-id="3"
-             data-name="Encens Royal"
-             data-price="€ 395"
-             data-description="A rare oud and incense composition of regal complexity. Sacred resins from the Hadramawt, aged oud from Laos, and cool vetiver create an austere yet magnetic fragrance that commands presence."
-             data-top-notes="Saffron, Elemi Resin, Cardamom"
-             data-heart-notes="Laotian Oud, Frankincense, Myrrh"
-             data-base-notes="Vetiver, Labdanum, Leather, Ambergris">
-
-          <div class="product-badge badge-limited">Limited</div>
-
-          <div class="product-image-wrap">
-            <!-- REPLACE: Swap with <img src="…" alt="Encens Royal"> -->
-            <div class="product-img-placeholder" style="--b-color: #A07828; --b-bg: #0c0900;">
-              <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Rectangular, assertive masculine form -->
-                <rect x="46" y="4" width="8" height="8" rx="2" fill="var(--b-color)" opacity="0.9"/>
-                <rect x="42" y="12" width="16" height="10" rx="3" fill="var(--b-color)" opacity="0.85"/>
-                <path d="M38 22 L34 42 L66 42 L62 22 Z" fill="var(--b-color)" opacity="0.7"/>
-                <path d="M20 42 L18 60 L18 155 L82 155 L82 60 L80 42 Z" fill="var(--b-color)" opacity="0.12"/>
-                <rect x="24" y="66" width="7" height="78" rx="3.5" fill="white" opacity="0.13"/>
-                <rect x="28" y="90" width="44" height="44" rx="3" fill="none" stroke="var(--b-color)" stroke-width="1" opacity="0.6"/>
-                <line x1="34" y1="106" x2="66" y2="106" stroke="var(--b-color)" stroke-width="0.7" opacity="0.5"/>
-                <line x1="36" y1="118" x2="64" y2="118" stroke="var(--b-color)" stroke-width="0.5" opacity="0.35"/>
-                <rect x="18" y="155" width="64" height="6" rx="3" fill="var(--b-color)" opacity="0.38"/>
-                <path d="M20 42 L18 60 L18 155 L82 155 L82 60 L80 42 Z" fill="none" stroke="var(--b-color)" stroke-width="0.7" opacity="0.28"/>
-              </svg>
-            </div>
-            <!-- END REPLACE -->
-            <div class="product-img-overlay"></div>
-          </div>
-
-          <div class="product-info">
-            <div class="product-category-tag">Men · Woody Oriental</div>
-            <h3 class="product-name">Encens Royal</h3>
-            <p class="product-desc">Sacred oud, ancient resins, and rare spices — a fragrance of sovereign presence.</p>
-            <div class="product-footer">
-              <span class="product-price">€ 395</span>
-              <button class="btn-view-detail" data-product-id="3">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- END PRODUCT 3 -->
-
-
-        <!-- ────────────────────────────────────────────
-             PRODUCT 4 — Rosée d'Aurore
-        ──────────────────────────────────────────── -->
-        <div class="product-card reveal reveal-delay-3"
-             data-category="women"
-             data-product-id="4"
-             data-name="Rosée d'Aurore"
-             data-price="€ 189"
-             data-description="A delicate morning fragrance of fresh florals and translucent dew. Tender petals of freesia and white rose, lit by luminous citrus, over a soft white musk — pure, effortless radiance."
-             data-top-notes="Lemon, Freesia, White Peach"
-             data-heart-notes="White Rose, Lily of the Valley, Neroli"
-             data-base-notes="White Musk, Cashmeran, Soft Vetiver">
-
-          <!-- No badge for this product -->
-
-          <div class="product-image-wrap">
-            <!-- REPLACE: Swap with <img src="…" alt="Rosée d'Aurore"> -->
-            <div class="product-img-placeholder" style="--b-color: #D4A8A0; --b-bg: #120c0b;">
-              <!-- Feminine, rounded bottle shape -->
-              <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="43" y="6" width="14" height="6" rx="3" fill="var(--b-color)" opacity="0.8"/>
-                <path d="M35 12 C34 16 34 20 35 23 L65 23 C66 20 66 16 65 12 Z" fill="var(--b-color)" opacity="0.85"/>
-                <rect x="42" y="23" width="16" height="16" rx="3" fill="var(--b-color)" opacity="0.7"/>
-                <ellipse cx="50" cy="112" rx="32" ry="48" fill="var(--b-color)" opacity="0.13"/>
-                <rect x="30" y="90" width="6" height="40" rx="3" fill="white" opacity="0.2"/>
-                <ellipse cx="50" cy="112" rx="24" ry="34" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.5"/>
-                <line x1="38" y1="106" x2="62" y2="106" stroke="var(--b-color)" stroke-width="0.6" opacity="0.45"/>
-                <line x1="40" y1="116" x2="60" y2="116" stroke="var(--b-color)" stroke-width="0.4" opacity="0.3"/>
-                <ellipse cx="50" cy="155" rx="32" ry="4" fill="var(--b-color)" opacity="0.22"/>
-                <ellipse cx="50" cy="112" rx="32" ry="48" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.25"/>
-              </svg>
-            </div>
-            <!-- END REPLACE -->
-            <div class="product-img-overlay"></div>
-          </div>
-
-          <div class="product-info">
-            <div class="product-category-tag">Women · Fresh Floral</div>
-            <h3 class="product-name">Rosée d'Aurore</h3>
-            <p class="product-desc">Luminous florals kissed by morning dew — radiant, fresh, effortlessly elegant.</p>
-            <div class="product-footer">
-              <span class="product-price">€ 189</span>
-              <button class="btn-view-detail" data-product-id="4">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- END PRODUCT 4 -->
-
-
-        <!-- ────────────────────────────────────────────
-             PRODUCT 5 — Sombre Élégance
-        ──────────────────────────────────────────── -->
-        <div class="product-card reveal reveal-delay-4"
-             data-category="men"
-             data-product-id="5"
-             data-name="Sombre Élégance"
-             data-price="€ 265"
-             data-description="Refined masculinity. A crisp aromatic fougère that moves from cool lavender and sharp artemisia into the heart of dark oak moss and tobacco, grounded by rich balsam and a resonant leather accord."
-             data-top-notes="Lavender, Artemisia, Bergamot"
-             data-heart-notes="Tobacco, Geranium, Oak Moss"
-             data-base-notes="Balsam Fir, Leather, Tonka Bean, Oakwood">
-
-          <!-- No badge -->
-
-          <div class="product-image-wrap">
-            <!-- REPLACE: Swap with <img src="…" alt="Sombre Élégance"> -->
-            <div class="product-img-placeholder" style="--b-color: #5A7A6A; --b-bg: #04100a;">
-              <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Tall, clean, architectural masculine bottle -->
-                <rect x="44" y="4" width="12" height="6" rx="2" fill="var(--b-color)" opacity="0.8"/>
-                <rect x="36" y="10" width="28" height="14" rx="4" fill="var(--b-color)" opacity="0.9"/>
-                <rect x="41" y="24" width="18" height="16" rx="2" fill="var(--b-color)" opacity="0.7"/>
-                <path d="M26 40 L22 60 L22 158 L78 158 L78 60 L74 40 Z" fill="var(--b-color)" opacity="0.12"/>
-                <rect x="28" y="66" width="8" height="82" rx="4" fill="white" opacity="0.14"/>
-                <rect x="30" y="84" width="40" height="50" rx="2" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.6"/>
-                <line x1="36" y1="102" x2="64" y2="102" stroke="var(--b-color)" stroke-width="0.6" opacity="0.5"/>
-                <line x1="38" y1="114" x2="62" y2="114" stroke="var(--b-color)" stroke-width="0.4" opacity="0.35"/>
-                <rect x="22" y="158" width="56" height="6" rx="2" fill="var(--b-color)" opacity="0.32"/>
-                <path d="M26 40 L22 60 L22 158 L78 158 L78 60 L74 40 Z" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.28"/>
-              </svg>
-            </div>
-            <!-- END REPLACE -->
-            <div class="product-img-overlay"></div>
-          </div>
-
-          <div class="product-info">
-            <div class="product-category-tag">Men · Aromatic Fougère</div>
-            <h3 class="product-name">Sombre Élégance</h3>
-            <p class="product-desc">Cool lavender and dark oakmoss over leather and balsam — quiet, refined power.</p>
-            <div class="product-footer">
-              <span class="product-price">€ 265</span>
-              <button class="btn-view-detail" data-product-id="5">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- END PRODUCT 5 -->
-
-
-        <!-- ────────────────────────────────────────────
-             PRODUCT 6 — Éclat Absolu
-        ──────────────────────────────────────────── -->
-        <div class="product-card reveal reveal-delay-5"
-             data-category="unisex limited"
-             data-product-id="6"
-             data-name="Éclat Absolu"
-             data-price="€ 345"
-             data-description="A transcendent unisex creation that blurs all boundaries. Luminous yuzu and raw silk open onto a heart of iris and ambrette seed, dissolving into an airy trail of skin musk and mineral vetiver."
-             data-top-notes="Yuzu, Aldehydes, White Pepper"
-             data-heart-notes="Iris, Ambrette Seed, White Cedar"
-             data-base-notes="Mineral Vetiver, Skin Musk, Amber">
-
-          <div class="product-badge badge-new">New</div>
-
-          <div class="product-image-wrap">
-            <!-- REPLACE: Swap with <img src="…" alt="Éclat Absolu"> -->
-            <div class="product-img-placeholder" style="--b-color: #D4C8B0; --b-bg: #0e0e0c;">
-              <!-- Art deco faceted unisex bottle -->
-              <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="47" y="5" width="10" height="7" rx="2" fill="var(--b-color)" opacity="0.8"/>
-                <path d="M38 12 L36 20 L64 20 L62 12 Z" fill="var(--b-color)" opacity="0.85"/>
-                <rect x="40" y="20" width="20" height="18" rx="3" fill="var(--b-color)" opacity="0.7"/>
-                <path d="M28 38 L24 56 L22 92 L22 152 L78 152 L78 92 L76 56 L72 38 Z" fill="var(--b-color)" opacity="0.12"/>
-                <!-- Facets -->
-                <path d="M28 38 L34 56 L34 152" fill="none" stroke="white" stroke-width="0.5" opacity="0.18"/>
-                <path d="M72 38 L66 56 L66 152" fill="none" stroke="white" stroke-width="0.3" opacity="0.1"/>
-                <rect x="30" y="86" width="40" height="44" rx="2" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.6"/>
-                <line x1="36" y1="102" x2="64" y2="102" stroke="var(--b-color)" stroke-width="0.6" opacity="0.5"/>
-                <line x1="38" y1="114" x2="62" y2="114" stroke="var(--b-color)" stroke-width="0.4" opacity="0.35"/>
-                <rect x="22" y="152" width="56" height="6" rx="3" fill="var(--b-color)" opacity="0.28"/>
-                <path d="M28 38 L24 56 L22 92 L22 152 L78 152 L78 92 L76 56 L72 38 Z" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.3"/>
-              </svg>
-            </div>
-            <!-- END REPLACE -->
-            <div class="product-img-overlay"></div>
-          </div>
-
-          <div class="product-info">
-            <div class="product-category-tag">Unisex · Iris &amp; Musk</div>
-            <h3 class="product-name">Éclat Absolu</h3>
-            <p class="product-desc">Luminous iris and weightless skin musk — a fragrance of pure, translucent radiance.</p>
-            <div class="product-footer">
-              <span class="product-price">€ 345</span>
-              <button class="btn-view-detail" data-product-id="6">View Details</button>
-            </div>
-          </div>
-        </div>
-        <!-- END PRODUCT 6 -->
-
-
-      </div><!-- /products-grid -->
     </div>
   </section>
 
@@ -594,7 +336,7 @@
 
           <div class="modal-footer-row">
             <span id="modalPrice" class="modal-price"></span>
-            <button class="btn btn-primary" id="modalAddToCart">Add to Cart</button>
+            <button class="btn btn-primary" id="modalAddToCart" data-i18n="products.addToCart">Add to Cart</button>
           </div>
         </div>
 
@@ -727,6 +469,13 @@
   </footer>
 
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/lupi-db.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

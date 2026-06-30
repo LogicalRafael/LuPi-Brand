@@ -136,17 +136,17 @@
 
 
 /* ─── PRODUCT FILTER ─────────────────────────────────────────── */
-(function initFilter() {
+function initFilter() {
   const btns  = document.querySelectorAll('.filter-btn');
-  const cards = document.querySelectorAll('.product-card');
 
   btns.forEach(btn => {
     btn.addEventListener('click', () => {
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const f = btn.dataset.filter;
-      let idx = 0;
+      const f     = btn.dataset.filter;
+      const cards = document.querySelectorAll('#productsGrid .product-card');
+      let   idx   = 0;
 
       cards.forEach(card => {
         const cat  = card.dataset.category || '';
@@ -155,7 +155,6 @@
         card.classList.toggle('hidden', !show);
 
         if (show) {
-          /* Stagger re-entrance animation */
           card.style.animation = 'none';
           void card.offsetWidth;
           card.style.animation = `fadeUp 0.45s ease ${idx * 0.07}s both`;
@@ -164,10 +163,12 @@
       });
     });
   });
-})();
+}
 
 
 /* ─── PRODUCT MODAL ──────────────────────────────────────────── */
+let openProductModal; // exposed so dynamically rendered cards can call it
+
 (function initModal() {
   const overlay    = document.getElementById('productModal');
   const closeBtn   = document.getElementById('modalClose');
@@ -215,71 +216,267 @@
     document.body.style.overflow = 'hidden';
   }
 
+  openProductModal = open; // expose globally
+
   function close() {
     overlay.classList.remove('open');
     document.body.style.overflow = '';
     activeId = null;
   }
 
-  /* Open via "View Details" button */
-  document.querySelectorAll('.btn-view-detail').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      open(btn.dataset.productId);
-    });
-  });
-
-  /* Open via card click */
-  document.querySelectorAll('.product-card').forEach(card => {
-    card.addEventListener('click', () => open(card.dataset.productId));
-  });
-
-  /* Close */
   closeBtn.addEventListener('click', close);
   overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
-  /* Add to cart from modal */
   addCartBtn.addEventListener('click', () => {
-    if (activeId) { addToCart(activeId); close(); }
+    if (!activeId) return;
+    const d = getData(activeId);
+    if (d) {
+      LupiCart.add({
+        id:       activeId,
+        name:     d.name,
+        price:    d.price,
+        priceNum: parseFloat((d.price || '').replace(/[^\d.]/g, '')) || 0,
+        category: d.category
+      });
+    }
+    close();
   });
 })();
 
 
-/* ─── CART ───────────────────────────────────────────────────── */
-const cart = [];
+/* ─── SHARED CARD RENDERER ───────────────────────────────────── */
+const CART_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`;
 
-function addToCart(productId) {
-  const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
-  if (!card) return;
+function renderProductCard(p, delayClass, catSVG) {
+  const badge    = p.badge || p.badge_text ? `<div class="product-badge ${_badgeClass(p.badge || p.badge_text)}">${p.badge || p.badge_text}</div>` : '';
+  const imgInner = p.image_url
+    ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;border-radius:2px">`
+    : `<div class="product-img-placeholder" style="--b-color:${p.color||'#C9A96E'};--b-bg:${p.bg||'#0c0a06'}">
+         <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+           ${p.bottle_svg || catSVG || ''}
+         </svg>
+       </div>`;
 
-  cart.push({ id: productId, name: card.dataset.name, price: card.dataset.price });
-  updateCartBadge();
-  showToast(`✦  ${card.dataset.name} added to cart`);
+  return `
+    <div class="product-card reveal${delayClass}"
+         data-category="${p.category||''}"
+         data-product-id="${p.id}"
+         data-name="${p.name}"
+         data-price="${p.price}"
+         data-description="${(p.description||'').replace(/"/g,'&quot;')}"
+         data-top-notes="${(p.top_notes||'').replace(/"/g,'&quot;')}"
+         data-heart-notes="${(p.heart_notes||'').replace(/"/g,'&quot;')}"
+         data-base-notes="${(p.base_notes||'').replace(/"/g,'&quot;')}">
+      ${badge}
+      <div class="product-image-wrap">
+        ${imgInner}
+        <div class="product-img-overlay"></div>
+      </div>
+      <div class="product-info">
+        <div class="product-category-tag">${p.category_label||p.categoryLabel||''}</div>
+        <h3 class="product-name">${p.name}</h3>
+        <p class="product-desc">${(p.description||'').substring(0,90)}${(p.description||'').length>90?'…':''}</p>
+        <div class="product-footer">
+          <div class="product-price-group">
+            <span class="product-price">${p.price}</span>
+            <button class="btn-cart-quick" data-product-id="${p.id}" aria-label="Add to Cart">
+              ${CART_ICON}
+            </button>
+          </div>
+          <button class="btn-view-detail" data-product-id="${p.id}" data-i18n="products.viewDetails">View Details</button>
+        </div>
+      </div>
+    </div>`;
 }
 
-function updateCartBadge() {
-  const el = document.getElementById('cartCount');
-  if (!el) return;
-  el.textContent = cart.length;
-  el.classList.toggle('show', cart.length > 0);
+function _badgeClass(badge) {
+  if (!badge) return '';
+  const b = badge.toLowerCase();
+  if (b.includes('best') || b.includes('seller')) return 'badge-bestseller';
+  if (b.includes('limit'))  return 'badge-limited';
+  return 'badge-new';
 }
 
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-
-  const t = document.createElement('div');
-  t.className   = 'toast';
-  t.textContent = msg;
-  document.body.appendChild(t);
-
-  setTimeout(() => {
-    t.style.transition = 'opacity 0.4s ease';
-    t.style.opacity    = '0';
-    setTimeout(() => t.remove(), 440);
-  }, 2800);
+function wireReveal(container) {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+  container.querySelectorAll('.reveal').forEach(el => io.observe(el));
 }
+
+
+/* ─── PERFUMES PANEL (dynamic from DB / fallback) ────────────── */
+async function initPerfumes() {
+  const grid = document.getElementById('productsGrid');
+  if (!grid) return;
+
+  let products = null;
+
+  if (typeof LupiDB !== 'undefined') {
+    products = await LupiDB.getByType('perfume');
+  }
+
+  /* Fall back to static data */
+  if (!products || !products.length) {
+    products = (typeof PERFUMES_FALLBACK !== 'undefined') ? PERFUMES_FALLBACK : [];
+  }
+
+  const DELAYS = ['', ' reveal-delay-1', ' reveal-delay-2', ' reveal-delay-3', ' reveal-delay-4', ' reveal-delay-5'];
+  grid.innerHTML = products.map((p, i) => renderProductCard(p, DELAYS[i] || '', '')).join('');
+
+  wireReveal(grid);
+
+  /* wire modal open via card click */
+  grid.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (typeof openProductModal === 'function') openProductModal(card.dataset.productId);
+    });
+  });
+  grid.querySelectorAll('.btn-view-detail').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (typeof openProductModal === 'function') openProductModal(btn.dataset.productId);
+    });
+  });
+
+  initFilter();
+  LupiCart.bindQuickAddButtons();
+}
+
+
+/* ─── CATEGORY TABS ──────────────────────────────────────────── */
+(function initCategoryTabs() {
+  const tabs = document.querySelectorAll('.cat-tab');
+  if (!tabs.length) return;
+
+  const CAT_SVG = {
+    handsoap: `
+      <rect x="47" y="6" width="8" height="3" rx="1.5" fill="var(--b-color)" opacity="0.75"/>
+      <rect x="49" y="9" width="4" height="20" rx="2" fill="var(--b-color)" opacity="0.65"/>
+      <rect x="38" y="26" width="24" height="12" rx="5" fill="var(--b-color)" opacity="0.85"/>
+      <rect x="44" y="38" width="12" height="8" rx="2" fill="var(--b-color)" opacity="0.65"/>
+      <rect x="22" y="46" width="56" height="104" rx="12" fill="var(--b-color)" opacity="0.11"/>
+      <rect x="28" y="52" width="7" height="82" rx="3.5" fill="white" opacity="0.18"/>
+      <rect x="26" y="78" width="48" height="44" rx="3" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.55"/>
+      <line x1="33" y1="96" x2="67" y2="96" stroke="var(--b-color)" stroke-width="0.6" opacity="0.45"/>
+      <line x1="35" y1="108" x2="65" y2="108" stroke="var(--b-color)" stroke-width="0.4" opacity="0.3"/>
+      <rect x="22" y="150" width="56" height="6" rx="3" fill="var(--b-color)" opacity="0.28"/>
+      <rect x="22" y="46" width="56" height="104" rx="12" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.25"/>`,
+    roomspray: `
+      <rect x="53" y="12" width="22" height="6" rx="3" fill="var(--b-color)" opacity="0.75"/>
+      <rect x="60" y="6" width="8" height="18" rx="3" fill="var(--b-color)" opacity="0.85"/>
+      <rect x="36" y="16" width="28" height="18" rx="5" fill="var(--b-color)" opacity="0.9"/>
+      <rect x="42" y="34" width="16" height="10" rx="2" fill="var(--b-color)" opacity="0.65"/>
+      <rect x="28" y="44" width="44" height="110" rx="6" fill="var(--b-color)" opacity="0.12"/>
+      <rect x="33" y="50" width="7" height="90" rx="3.5" fill="white" opacity="0.16"/>
+      <rect x="30" y="78" width="40" height="50" rx="3" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.55"/>
+      <line x1="36" y1="98" x2="64" y2="98" stroke="var(--b-color)" stroke-width="0.6" opacity="0.45"/>
+      <line x1="38" y1="112" x2="62" y2="112" stroke="var(--b-color)" stroke-width="0.4" opacity="0.3"/>
+      <rect x="28" y="154" width="44" height="6" rx="3" fill="var(--b-color)" opacity="0.28"/>
+      <rect x="28" y="44" width="44" height="110" rx="6" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.25"/>`,
+    candle: `
+      <path d="M50 18 C47 13 45 9 50 5 C55 9 53 13 50 18Z" fill="var(--b-color)" opacity="0.75"/>
+      <path d="M50 22 C48 18 47 14 50 11 C53 14 52 18 50 22Z" fill="var(--b-color)" opacity="0.35"/>
+      <line x1="50" y1="22" x2="50" y2="35" stroke="var(--b-color)" stroke-width="1.5" opacity="0.65"/>
+      <ellipse cx="50" cy="35" rx="28" ry="5" fill="var(--b-color)" opacity="0.55"/>
+      <rect x="20" y="35" width="60" height="112" rx="6" fill="var(--b-color)" opacity="0.12"/>
+      <rect x="24" y="40" width="8" height="90" rx="4" fill="white" opacity="0.18"/>
+      <rect x="22" y="75" width="56" height="46" rx="2" fill="none" stroke="var(--b-color)" stroke-width="0.8" opacity="0.55"/>
+      <line x1="28" y1="94" x2="72" y2="94" stroke="var(--b-color)" stroke-width="0.6" opacity="0.45"/>
+      <line x1="30" y1="108" x2="70" y2="108" stroke="var(--b-color)" stroke-width="0.4" opacity="0.3"/>
+      <rect x="20" y="147" width="60" height="8" rx="4" fill="var(--b-color)" opacity="0.28"/>
+      <rect x="20" y="35" width="60" height="112" rx="6" fill="none" stroke="var(--b-color)" stroke-width="0.6" opacity="0.25"/>`
+  };
+
+  /* DB type key → HTML grid ID and static fallback key */
+  const CAT_MAP = {
+    handsoap:   { gridId: 'grid-handsoap',   staticKey: 'handsoap',   dbType: 'handsoap'  },
+    roomsprays: { gridId: 'grid-roomsprays',  staticKey: 'roomsprays', dbType: 'roomspray' },
+    candles:    { gridId: 'grid-candles',     staticKey: 'candles',    dbType: 'candle'    },
+  };
+
+  const DELAYS = ['', ' reveal-delay-1', ' reveal-delay-2', ' reveal-delay-3'];
+  const rendered = {};
+
+  async function renderPanel(cat) {
+    if (rendered[cat]) return;
+    rendered[cat] = true;
+
+    const map  = CAT_MAP[cat];
+    const grid = document.getElementById(map.gridId);
+    if (!grid) return;
+
+    let products = null;
+
+    if (typeof LupiDB !== 'undefined') {
+      products = await LupiDB.getByType(map.dbType);
+    }
+
+    /* Fall back to CATEGORY_PRODUCTS static data */
+    if (!products || !products.length) {
+      const raw = (typeof CATEGORY_PRODUCTS !== 'undefined') ? CATEGORY_PRODUCTS[map.staticKey] || [] : [];
+      products  = raw.map(p => ({
+        ...p,
+        price_num:      p.priceNum,
+        category_label: p.categoryLabel,
+        top_notes:      p.topNotes,
+        heart_notes:    p.heartNotes,
+        base_notes:     p.baseNotes,
+      }));
+    }
+
+    const svgKey = map.dbType; // 'handsoap' | 'roomspray' | 'candle'
+    grid.innerHTML = products.map((p, i) =>
+      renderProductCard(p, DELAYS[i] || '', CAT_SVG[svgKey] || '')
+    ).join('');
+
+    wireReveal(grid);
+
+    grid.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', () => openProductModal?.(card.dataset.productId));
+    });
+    grid.querySelectorAll('.btn-view-detail').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); openProductModal?.(btn.dataset.productId); });
+    });
+
+    LupiCart.bindQuickAddButtons();
+  }
+
+  function switchTab(cat) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+    document.querySelectorAll('.cat-panel').forEach(p => {
+      p.classList.toggle('cat-panel-hidden', p.id !== `panel-${cat}`);
+    });
+    if (cat !== 'perfumes') renderPanel(cat);
+  }
+
+  tabs.forEach(tab => tab.addEventListener('click', () => switchTab(tab.dataset.cat)));
+})();
+
+
+/* ─── CART + AUTH + I18N INIT ─────────────────────────────────
+   LupiCart, LupiAuth, and LUPI_LANG are loaded from their own
+   script files before main.js. Init order matters.
+──────────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  LUPI_LANG.init();
+  LupiCart.init();
+  await LupiAuth.init();
+
+  /* Inject admin nav link for admin users */
+  if (LupiAuth.isAdmin()) {
+    const navLinks = document.getElementById('navLinks');
+    if (navLinks) {
+      const li = document.createElement('li');
+      li.innerHTML = '<a href="admin.html" class="nav-link" style="color:var(--gold)">Admin</a>';
+      navLinks.appendChild(li);
+    }
+  }
+
+  /* Load perfumes dynamically (DB or fallback) */
+  await initPerfumes();
+});
 
 
 /* ─── SCROLL REVEAL ──────────────────────────────────────────── */

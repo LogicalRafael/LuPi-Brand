@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — LUPI</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Raleway:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/lupi-features.css">
+
+  <!--
+    ============================================================
+    PAYMENT PROVIDER SETUP
+    ============================================================
+    To integrate Stripe:
+      1. Sign up at https://stripe.com
+      2. Copy your publishable key from Dashboard → Developers → API Keys
+      3. Uncomment the line below and replace the placeholder key
+      4. Follow the Stripe Elements guide to mount a real card input
+         instead of the placeholder fields: https://stripe.com/docs/stripe-js
+
+    <script src="https://js.stripe.com/v3/"></script>
+
+    Then in the checkout submit handler (see initCheckout below):
+      const stripe  = Stripe('pk_live_YOUR_PUBLISHABLE_KEY');
+      const elements = stripe.elements();
+      const cardEl   = elements.create('card');
+      cardEl.mount('#stripe-card-element');
+
+      // On form submit — create PaymentIntent via your backend and confirm:
+      // stripe.confirmCardPayment(clientSecret, { payment_method: { card: cardEl } })
+
+    Alternative — Stripe Checkout (no backend needed for simple cases):
+      stripe.redirectToCheckout({ lineItems: [...], mode: 'payment', ... })
+    ============================================================
+  -->
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+
+      <a href="index.html" class="nav-logo">
+        <span class="logo-text">LUPI</span>
+        <span class="logo-tagline">Maison de Parfums</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#home"     class="nav-link" data-i18n="nav.home">Home</a></li>
+        <li><a href="index.html#about"    class="nav-link" data-i18n="nav.about">About</a></li>
+        <li><a href="index.html#products" class="nav-link" data-i18n="nav.collection">Collection</a></li>
+        <li><a href="index.html#contact"  class="nav-link" data-i18n="nav.contact">Contact</a></li>
+        <li><a href="new-releases.html"   class="nav-link" data-i18n="nav.newReleases">New Releases</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="lang-selector" id="langDropdown">
+          <button class="lang-trigger" id="langTrigger" aria-label="Select language">
+            <span id="langCurrent">EN</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lang-menu">
+            <button class="lang-option active" data-lang="en">English</button>
+            <button class="lang-option"        data-lang="pt">Português</button>
+            <button class="lang-option"        data-lang="es">Español</button>
+            <button class="lang-option"        data-lang="fr">Français</button>
+          </div>
+        </div>
+        <button class="cart-btn" id="authNavBtn" aria-label="Account" data-i18n-title="nav.login">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </button>
+        <button class="cart-btn" id="cartBtn" aria-label="Shopping cart" data-i18n-title="nav.cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       CHECKOUT PAGE
+  ============================================================ -->
+  <main class="checkout-page">
+
+    <!-- Order Confirmation (hidden until order placed) -->
+    <div id="orderConfirmation" class="order-confirmation hidden">
+      <div class="confirmation-card">
+        <div class="confirmation-icon">✦</div>
+        <h1 data-i18n="confirmation.title">Order Confirmed</h1>
+        <p data-i18n="confirmation.subtitle">
+          Thank you for your order. A confirmation will be sent to your email.
+        </p>
+        <div class="order-ref-display">
+          <span class="order-ref-label" data-i18n="confirmation.orderNumber">Order Reference</span>
+          <span class="order-ref-value" id="confirmOrderRef">—</span>
+        </div>
+        <a href="index.html" class="btn btn-primary" data-i18n="confirmation.returnHome">Return Home</a>
+      </div>
+    </div>
+
+    <!-- Checkout form -->
+    <div id="checkoutContent" class="checkout-content">
+
+      <div class="checkout-top">
+        <h1 class="checkout-page-title" data-i18n="checkout.title">Checkout</h1>
+        <a href="javascript:history.back()" class="checkout-back" data-i18n="checkout.backToCart">← Back</a>
+      </div>
+
+      <!-- Guest / login prompt -->
+      <div class="checkout-guest-notice" id="guestNotice">
+        <span data-i18n="checkout.guestCheckout">Checking out as guest.</span>
+        &nbsp;
+        <span data-i18n="checkout.loginPrompt">Have an account?</span>
+        <a href="#" id="checkoutLoginLink" data-i18n="checkout.loginLink">Sign in for faster checkout</a>
+      </div>
+
+      <div class="checkout-grid">
+
+        <!-- LEFT: form -->
+        <div class="checkout-left">
+
+          <form id="checkoutForm" novalidate>
+
+            <h2 class="checkout-section-title" data-i18n="checkout.customerInfo">Customer Information</h2>
+            <div class="checkout-fields">
+              <div class="field-group field-full">
+                <label data-i18n="checkout.fullName">Full Name</label>
+                <input type="text" name="fullName" class="form-input" required autocomplete="name" placeholder="Alexandre Dumont">
+              </div>
+              <div class="field-group">
+                <label data-i18n="checkout.email">Email Address</label>
+                <input type="email" name="email" class="form-input" required autocomplete="email" placeholder="hello@example.com">
+              </div>
+              <div class="field-group">
+                <label data-i18n="checkout.phone">Phone Number</label>
+                <input type="tel" name="phone" class="form-input" autocomplete="tel" placeholder="+351 900 000 000">
+              </div>
+              <div class="field-group field-full">
+                <label data-i18n="checkout.address">Street Address</label>
+                <input type="text" name="address" class="form-input" required autocomplete="street-address" placeholder="123 Rue de Rivoli">
+              </div>
+              <div class="field-group">
+                <label data-i18n="checkout.city">City</label>
+                <input type="text" name="city" class="form-input" required autocomplete="address-level2" placeholder="Lisbon">
+              </div>
+              <div class="field-group">
+                <label data-i18n="checkout.postalCode">Postal Code</label>
+                <input type="text" name="postalCode" class="form-input" required autocomplete="postal-code" placeholder="1000-001">
+              </div>
+              <div class="field-group field-full">
+                <label data-i18n="checkout.country">Country</label>
+                <input type="text" name="country" class="form-input" required autocomplete="country-name" placeholder="Portugal">
+              </div>
+              <div class="field-group field-full">
+                <label data-i18n="checkout.notes">Notes / Special Instructions</label>
+                <textarea name="notes" class="form-input form-textarea" rows="3"
+                  data-i18n-placeholder="checkout.notesPlaceholder"
+                  placeholder="Any special requests or delivery notes…"></textarea>
+              </div>
+            </div>
+
+            <!-- Payment — configure when ready -->
+            <!-- See the <head> comment in checkout.html to integrate Stripe or another provider -->
+
+            <button type="submit" class="btn btn-primary btn-checkout-submit" id="placeOrderBtn">
+              <span data-i18n="checkout.placeOrder">Place Order</span>
+            </button>
+
+          </form>
+        </div>
+
+        <!-- RIGHT: order summary -->
+        <div class="checkout-right">
+          <h2 class="checkout-section-title" data-i18n="checkout.orderSummary">Order Summary</h2>
+          <div id="checkoutOrderItems" class="checkout-order-items">
+            <p class="checkout-empty-notice">Loading…</p>
+          </div>
+          <div class="checkout-totals">
+            <div class="checkout-total-row">
+              <span data-i18n="checkout.subtotal">Subtotal</span>
+              <span id="checkoutSubtotal">—</span>
+            </div>
+            <div class="checkout-total-row">
+              <span data-i18n="checkout.shipping">Shipping</span>
+              <span data-i18n="checkout.shippingNote">Calculated at delivery</span>
+            </div>
+            <div class="checkout-total-row checkout-total-final">
+              <span data-i18n="checkout.total">Total</span>
+              <span id="checkoutTotal">—</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+  'use strict';
+
+  /* ── Navbar scroll ───────────────────────────────────────── */
+  (function () {
+    const navbar = document.getElementById('navbar');
+    if (!navbar) return;
+    function update() { navbar.classList.toggle('scrolled', window.scrollY > 60); }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+
+  /* ── Mobile menu ─────────────────────────────────────────── */
+  (function () {
+    const toggle   = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (!toggle) return;
+    function close() {
+      toggle.classList.remove('active');
+      navLinks.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    toggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      toggle.classList.toggle('active', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    navLinks.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', close));
+    document.addEventListener('click', e => {
+      if (!toggle.contains(e.target) && !navLinks.contains(e.target)) close();
+    });
+  })();
+
+  /* ── Checkout logic ──────────────────────────────────────── */
+  function initCheckout() {
+    if (typeof LupiCart === 'undefined') return;
+
+    const items = LupiCart.getItems();
+
+    /* Redirect if cart is empty */
+    if (items.length === 0) {
+      window.location.replace('index.html');
+      return;
+    }
+
+    /* Render order summary */
+    const itemsEl   = document.getElementById('checkoutOrderItems');
+    const subEl     = document.getElementById('checkoutSubtotal');
+    const totalEl   = document.getElementById('checkoutTotal');
+
+    if (itemsEl) {
+      itemsEl.innerHTML = items.map(item => `
+        <div class="checkout-order-item">
+          <span class="checkout-item-name">${item.name}</span>
+          <span class="checkout-item-qty">×${item.qty}</span>
+          <span class="checkout-item-price">${LupiCart.formatPrice(item.priceNum * item.qty)}</span>
+        </div>`).join('');
+    }
+
+    const sub = LupiCart.subtotal();
+    if (subEl)   subEl.textContent   = LupiCart.formatPrice(sub);
+    if (totalEl) totalEl.textContent = LupiCart.formatPrice(sub);
+
+    /* Hide guest notice if logged in */
+    const user        = LupiAuth.getUser();
+    const guestNotice = document.getElementById('guestNotice');
+    if (user && guestNotice) guestNotice.classList.add('hidden');
+
+    /* Pre-fill form if user is logged in */
+    if (user) {
+      const form = document.getElementById('checkoutForm');
+      if (form) {
+        form.querySelector('[name="fullName"]').value = user.name  || '';
+        form.querySelector('[name="email"]').value    = user.email || '';
+      }
+    }
+
+    /* Login link inside checkout */
+    const loginLink = document.getElementById('checkoutLoginLink');
+    if (loginLink) {
+      loginLink.addEventListener('click', e => {
+        e.preventDefault();
+        LupiAuth.openModal('login');
+      });
+    }
+
+    /* Form submit */
+    const form       = document.getElementById('checkoutForm');
+    const placeBtn   = document.getElementById('placeOrderBtn');
+    if (!form) return;
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      /* ── PAYMENT PROCESSING ──────────────────────────────
+         PLACEHOLDER — no real payment is processed here.
+         When you add Stripe (or another provider):
+           1. Validate card fields via provider SDK
+           2. Create a PaymentIntent on your backend
+           3. Confirm payment client-side
+           4. Only clear the cart and show confirmation on success
+         ────────────────────────────────────────────────── */
+
+      const T = key => LUPI_LANG.t(key);
+
+      placeBtn.disabled      = true;
+      placeBtn.querySelector('span').textContent = T('checkout.processing');
+
+      /* Simulate async processing (remove this timeout in production) */
+      setTimeout(() => {
+        const ref = 'LUPI-' + Date.now().toString(36).toUpperCase();
+
+        /* Save order if user is logged in */
+        if (LupiAuth.getUser()) {
+          LupiAuth.saveOrder({
+            ref,
+            date:  Date.now(),
+            total: LupiCart.formatPrice(LupiCart.subtotal()),
+            items: LupiCart.getItems(),
+          });
+        }
+
+        LupiCart.clear();
+
+        /* Show confirmation */
+        document.getElementById('checkoutContent').style.display   = 'none';
+        const conf = document.getElementById('orderConfirmation');
+        conf.classList.remove('hidden');
+        const refEl = document.getElementById('confirmOrderRef');
+        if (refEl) refEl.textContent = ref;
+
+        /* Re-apply i18n on new elements */
+        LUPI_LANG.init();
+      }, 1200);
+    });
+  }
+
+  /* ── Boot ────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', () => {
+    LUPI_LANG.init();
+    LupiCart.init();
+    LupiAuth.init();
+    initCheckout();
+  });
+  </script>
+
+</body>
+</html>

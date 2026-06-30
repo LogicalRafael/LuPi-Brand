@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="newReleases.pageTitle">New Releases — LUPI</title>
+  <meta name="description" content="Discover the newest fragrance releases from LUPI Maison de Parfums.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Raleway:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/lupi-features.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+
+      <a href="index.html" class="nav-logo">
+        <span class="logo-text">LUPI</span>
+        <span class="logo-tagline">Maison de Parfums</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#home"     class="nav-link" data-i18n="nav.home">Home</a></li>
+        <li><a href="index.html#about"    class="nav-link" data-i18n="nav.about">About</a></li>
+        <li><a href="index.html#products" class="nav-link" data-i18n="nav.collection">Collection</a></li>
+        <li><a href="index.html#contact"  class="nav-link" data-i18n="nav.contact">Contact</a></li>
+        <li><a href="new-releases.html"   class="nav-link active" data-i18n="nav.newReleases">New Releases</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <div class="lang-selector" id="langDropdown">
+          <button class="lang-trigger" id="langTrigger" aria-label="Select language">
+            <span id="langCurrent">EN</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lang-menu">
+            <button class="lang-option active" data-lang="en">English</button>
+            <button class="lang-option"        data-lang="pt">Português</button>
+            <button class="lang-option"        data-lang="es">Español</button>
+            <button class="lang-option"        data-lang="fr">Français</button>
+          </div>
+        </div>
+        <button class="cart-btn" id="authNavBtn" aria-label="Account" data-i18n-title="nav.login">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </button>
+        <button class="cart-btn" id="cartBtn" aria-label="Shopping cart" data-i18n-title="nav.cart">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       NEW RELEASES HERO
+  ============================================================ -->
+  <main class="nr-page">
+
+    <div class="nr-hero">
+      <div class="container">
+        <div class="section-label" data-i18n="newReleases.label">Recently Launched</div>
+        <h1 class="section-title">
+          <span data-i18n="newReleases.title">New</span>
+          <em data-i18n="newReleases.titleItalic">Arrivals</em>
+        </h1>
+        <p class="nr-hero-subtitle" data-i18n="newReleases.subtitle">
+          The newest expressions from the house of LUPI.
+        </p>
+      </div>
+    </div>
+
+
+    <!-- ============================================================
+         NEW RELEASES GRID (rendered from products-data.js)
+    ============================================================ -->
+    <section class="nr-grid-section">
+      <div class="container">
+        <a href="index.html" class="nr-back-link">
+          ← <span data-i18n="nav.collection">Collection</span>
+        </a>
+        <div class="products-grid" id="nrGrid">
+          <!-- Populated by initNewReleasesPage() below -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ============================================================
+       PRODUCT DETAIL MODAL (same structure as index.html)
+  ============================================================ -->
+  <div id="productModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Product Detail">
+    <div class="modal-container">
+      <button class="modal-close" id="modalClose" aria-label="Close product detail">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="modal-content">
+        <div class="modal-image-side">
+          <div id="modalImageWrap" class="modal-image-wrap"></div>
+        </div>
+        <div class="modal-info-side">
+          <div id="modalCategory" class="modal-category"></div>
+          <h2 id="modalName"        class="modal-name"></h2>
+          <p  id="modalDescription" class="modal-description"></p>
+          <div class="modal-notes">
+            <div class="notes-row">
+              <span class="notes-label">Top Notes</span>
+              <span id="modalTopNotes" class="notes-value"></span>
+            </div>
+            <div class="notes-row">
+              <span class="notes-label">Heart Notes</span>
+              <span id="modalHeartNotes" class="notes-value"></span>
+            </div>
+            <div class="notes-row">
+              <span class="notes-label">Base Notes</span>
+              <span id="modalBaseNotes" class="notes-value"></span>
+            </div>
+          </div>
+          <div class="modal-footer-row">
+            <span id="modalPrice" class="modal-price"></span>
+            <button class="btn btn-primary" id="modalAddToCart" data-i18n="products.addToCart">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="logo-text footer-logo">LUPI</span>
+          <span class="logo-tagline">Maison de Parfums</span>
+          <p class="footer-desc">Crafted for those who inhabit their fragrance.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading" data-i18n="footer.navigate">Navigate</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#home"     data-i18n="nav.home">Home</a></li>
+            <li><a href="index.html#about"    data-i18n="nav.about">About</a></li>
+            <li><a href="index.html#products" data-i18n="nav.collection">Collection</a></li>
+            <li><a href="index.html#contact"  data-i18n="nav.contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading" data-i18n="footer.collection">Collection</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#products" data-i18n="footer.women">Women</a></li>
+            <li><a href="index.html#products" data-i18n="footer.men">Men</a></li>
+            <li><a href="index.html#products" data-i18n="footer.unisex">Unisex</a></li>
+            <li><a href="index.html#products" data-i18n="footer.limited">Limited Edition</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading" data-i18n="footer.legal">Legal</h4>
+          <ul class="footer-links">
+            <li><a href="#" data-i18n="footer.privacy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="footer.terms">Terms of Service</a></li>
+            <li><a href="#" data-i18n="footer.shipping">Shipping Policy</a></li>
+            <li><a href="#" data-i18n="footer.returns">Returns</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 LUPI Maison de Parfums. All rights reserved.</p>
+        <p class="footer-craft" data-i18n="footer.crafted">Crafted with intention.</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/lupi-db.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+  'use strict';
+
+  /* ── Navbar scroll behaviour (same as main site) ─────────── */
+  (function () {
+    const navbar = document.getElementById('navbar');
+    if (!navbar) return;
+    function update() { navbar.classList.toggle('scrolled', window.scrollY > 60); }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+
+  /* ── Mobile menu ─────────────────────────────────────────── */
+  (function () {
+    const toggle   = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    if (!toggle) return;
+    function close() {
+      toggle.classList.remove('active');
+      navLinks.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    toggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      toggle.classList.toggle('active', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    navLinks.querySelectorAll('.nav-link').forEach(l => l.addEventListener('click', close));
+    document.addEventListener('click', e => {
+      if (!toggle.contains(e.target) && !navLinks.contains(e.target)) close();
+    });
+  })();
+
+  /* ── Render new releases grid ────────────────────────────── */
+  async function initNewReleasesPage() {
+    const grid = document.getElementById('nrGrid');
+    if (!grid) return;
+
+    const T = key => LUPI_LANG.t(key);
+
+    /* Try DB first, fall back to static NEW_RELEASES */
+    let products = null;
+    if (typeof LupiDB !== 'undefined') {
+      products = await LupiDB.getByType('new_release');
+    }
+    if (!products || !products.length) {
+      products = (typeof NEW_RELEASES !== 'undefined')
+        ? NEW_RELEASES.map(p => ({
+            ...p,
+            price_num:      p.priceNum,
+            category_label: p.categoryLabel,
+            top_notes:      p.topNotes,
+            heart_notes:    p.heartNotes,
+            base_notes:     p.baseNotes,
+            release_date:   p.releaseDate,
+            bottle_svg:     (typeof NR_BOTTLE_SVGS !== 'undefined' && NR_BOTTLE_SVGS[p.id]) || '',
+          }))
+        : [];
+    }
+
+    grid.innerHTML = products.map((p, i) => {
+      const delay   = i > 0 ? ` reveal-delay-${Math.min(i, 5)}` : '';
+      const imgInner = p.image_url
+        ? `<img src="${p.image_url}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">`
+        : `<div class="product-img-placeholder" style="--b-color:${p.color||'#C9A96E'};--b-bg:${p.bg||'#0c0a06'}">
+             <svg class="bottle-svg" viewBox="0 0 100 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+               ${p.bottle_svg || ''}
+             </svg>
+           </div>`;
+
+      return `
+        <div class="product-card nr-product-card reveal${delay}"
+             data-category="${p.category||''}"
+             data-product-id="${p.id}"
+             data-name="${p.name}"
+             data-price="${p.price}"
+             data-description="${(p.description||'').replace(/"/g,'&quot;')}"
+             data-top-notes="${(p.top_notes||p.topNotes||'').replace(/"/g,'&quot;')}"
+             data-heart-notes="${(p.heart_notes||p.heartNotes||'').replace(/"/g,'&quot;')}"
+             data-base-notes="${(p.base_notes||p.baseNotes||'').replace(/"/g,'&quot;')}">
+
+          <div class="product-badge badge-new">${T('newReleases.newRelease')}</div>
+
+          <div class="product-image-wrap">
+            ${imgInner}
+            <div class="product-img-overlay"></div>
+          </div>
+
+          <div class="product-info">
+            <div class="product-category-tag">${p.category_label||p.categoryLabel||''}</div>
+            <h3 class="product-name">${p.name}</h3>
+            <p class="product-desc">${(p.description||'').substring(0, 90)}…</p>
+            <div class="nr-release-label">◈ ${p.release_date||p.releaseDate||''}</div>
+            <div class="product-footer">
+              <div class="product-price-group">
+                <span class="product-price">${p.price}</span>
+                <button class="btn-cart-quick" data-product-id="${p.id}" aria-label="${T('newReleases.addToCart')}">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 01-8 0"/>
+                  </svg>
+                </button>
+              </div>
+              <button class="btn-view-detail" data-product-id="${p.id}" data-i18n="newReleases.viewDetails">${T('newReleases.viewDetails')}</button>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    /* Scroll reveal */
+    const els = grid.querySelectorAll('.reveal');
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    els.forEach(el => io.observe(el));
+
+    /* Product modal */
+    initNrModal();
+  }
+
+  /* ── New Releases modal ──────────────────────────────────── */
+  function initNrModal() {
+    const overlay  = document.getElementById('productModal');
+    const closeBtn = document.getElementById('modalClose');
+    const addBtn   = document.getElementById('modalAddToCart');
+    if (!overlay) return;
+
+    let activeId = null;
+
+    function getData(id) {
+      const c = document.querySelector(`.product-card[data-product-id="${id}"]`);
+      if (!c) return null;
+      return {
+        id, name: c.dataset.name, price: c.dataset.price,
+        description: c.dataset.description,
+        topNotes: c.dataset.topNotes, heartNotes: c.dataset.heartNotes, baseNotes: c.dataset.baseNotes,
+        category: c.querySelector('.product-category-tag')?.textContent || '',
+        imageNode: c.querySelector('.product-img-placeholder')?.cloneNode(true) || null,
+      };
+    }
+
+    function open(id) {
+      const d = getData(id);
+      if (!d) return;
+      activeId = id;
+      document.getElementById('modalName').textContent        = d.name;
+      document.getElementById('modalPrice').textContent       = d.price;
+      document.getElementById('modalDescription').textContent = d.description;
+      document.getElementById('modalCategory').textContent    = d.category;
+      document.getElementById('modalTopNotes').textContent    = d.topNotes;
+      document.getElementById('modalHeartNotes').textContent  = d.heartNotes;
+      document.getElementById('modalBaseNotes').textContent   = d.baseNotes;
+      const wrap = document.getElementById('modalImageWrap');
+      wrap.innerHTML = '';
+      if (d.imageNode) wrap.appendChild(d.imageNode);
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      activeId = null;
+    }
+
+    document.querySelectorAll('.btn-view-detail').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); open(btn.dataset.productId); });
+    });
+    document.querySelectorAll('.nr-product-card').forEach(card => {
+      card.addEventListener('click', () => open(card.dataset.productId));
+    });
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+    addBtn.addEventListener('click', () => {
+      if (!activeId) return;
+      const d = getData(activeId);
+      if (d) {
+        LupiCart.add({
+          id: activeId, name: d.name, price: d.price,
+          priceNum: parseFloat((d.price || '').replace(/[^\d.]/g, '')) || 0,
+        });
+      }
+      close();
+    });
+  }
+
+  /* ── Boot ────────────────────────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', async () => {
+    LUPI_LANG.init();
+    LupiCart.init();
+    LupiAuth.init();
+    await initNewReleasesPage();
+    LupiCart.bindQuickAddButtons();
+  });
+  </script>
+
+</body>
+</html>
