@@ -70,6 +70,10 @@
             <button class="lang-option"        data-lang="pt">Português</button>
             <button class="lang-option"        data-lang="es">Español</button>
             <button class="lang-option"        data-lang="fr">Français</button>
+            <button class="lang-option"        data-lang="de">Deutsch</button>
+            <button class="lang-option"        data-lang="it">Italiano</button>
+            <button class="lang-option"        data-lang="el">Ελληνικά</button>
+            <button class="lang-option"        data-lang="ru">Русский</button>
           </div>
         </div>
         <button class="cart-btn" id="authNavBtn" aria-label="Account" data-i18n-title="nav.login">
@@ -353,14 +357,14 @@
         if (refEl) refEl.textContent = ref;
 
         /* Re-apply i18n on new elements */
-        LUPI_LANG.init();
+        LUPI_LANG.apply(LUPI_LANG.getLang());
       }, 1200);
     });
   }
 
   /* ── Boot ────────────────────────────────────────────────── */
-  document.addEventListener('DOMContentLoaded', () => {
-    LUPI_LANG.init();
+  document.addEventListener('DOMContentLoaded', async () => {
+    await LUPI_LANG.init();
     LupiCart.init();
     LupiAuth.init();
     initCheckout();

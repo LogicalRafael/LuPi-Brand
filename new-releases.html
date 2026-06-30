@@ -43,6 +43,10 @@
             <button class="lang-option"        data-lang="pt">Português</button>
             <button class="lang-option"        data-lang="es">Español</button>
             <button class="lang-option"        data-lang="fr">Français</button>
+            <button class="lang-option"        data-lang="de">Deutsch</button>
+            <button class="lang-option"        data-lang="it">Italiano</button>
+            <button class="lang-option"        data-lang="el">Ελληνικά</button>
+            <button class="lang-option"        data-lang="ru">Русский</button>
           </div>
         </div>
         <button class="cart-btn" id="authNavBtn" aria-label="Account" data-i18n-title="nav.login">
@@ -124,15 +128,15 @@
           <p  id="modalDescription" class="modal-description"></p>
           <div class="modal-notes">
             <div class="notes-row">
-              <span class="notes-label">Top Notes</span>
+              <span class="notes-label" data-i18n="products.topNotes">Top Notes</span>
               <span id="modalTopNotes" class="notes-value"></span>
             </div>
             <div class="notes-row">
-              <span class="notes-label">Heart Notes</span>
+              <span class="notes-label" data-i18n="products.heartNotes">Heart Notes</span>
               <span id="modalHeartNotes" class="notes-value"></span>
             </div>
             <div class="notes-row">
-              <span class="notes-label">Base Notes</span>
+              <span class="notes-label" data-i18n="products.baseNotes">Base Notes</span>
               <span id="modalBaseNotes" class="notes-value"></span>
             </div>
           </div>
@@ -155,7 +159,7 @@
         <div class="footer-brand">
           <span class="logo-text footer-logo">LUPI</span>
           <span class="logo-tagline">Maison de Parfums</span>
-          <p class="footer-desc">Crafted for those who inhabit their fragrance.</p>
+          <p class="footer-desc" data-i18n="footer.tagline">Crafted for those who inhabit their fragrance.</p>
         </div>
         <div class="footer-col">
           <h4 class="footer-heading" data-i18n="footer.navigate">Navigate</h4>
@@ -392,7 +396,7 @@
 
   /* ── Boot ────────────────────────────────────────────────── */
   document.addEventListener('DOMContentLoaded', async () => {
-    LUPI_LANG.init();
+    await LUPI_LANG.init();
     LupiCart.init();
     LupiAuth.init();
     await initNewReleasesPage();

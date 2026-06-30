@@ -49,6 +49,10 @@
             <button class="lang-option"        data-lang="pt">Português</button>
             <button class="lang-option"        data-lang="es">Español</button>
             <button class="lang-option"        data-lang="fr">Français</button>
+            <button class="lang-option"        data-lang="de">Deutsch</button>
+            <button class="lang-option"        data-lang="it">Italiano</button>
+            <button class="lang-option"        data-lang="el">Ελληνικά</button>
+            <button class="lang-option"        data-lang="ru">Русский</button>
           </div>
         </div>
 
@@ -98,12 +102,12 @@
 
         <!-- REPLACE: Main hero headline -->
         <h1 class="hero-title">
-          <span class="hero-line">The Art of</span>
-          <span class="hero-line italic">Invisible Elegance</span>
+          <span class="hero-line" data-i18n="hero.title1">The Art of</span>
+          <span class="hero-line italic" data-i18n="hero.title2">Invisible Elegance</span>
         </h1>
 
         <!-- REPLACE: Hero sub-description -->
-        <p class="hero-description">
+        <p class="hero-description" data-i18n-html="hero.description">
           Rare ingredients. Timeless compositions.<br>
           Fragrances crafted for those who understand<br>
           that true luxury is felt before it is seen.
@@ -116,7 +120,7 @@
 
         <div class="hero-scroll-hint">
           <div class="scroll-line"></div>
-          <span>Scroll to explore</span>
+          <span data-i18n="hero.scrollHint">Scroll to explore</span>
         </div>
       </div>
 
@@ -189,27 +193,27 @@
         </div>
 
         <div class="about-content">
-          <div class="section-label reveal">Our Story</div>
+          <div class="section-label reveal" data-i18n="about.label">Our Story</div>
           <!-- REPLACE: Update section heading -->
-          <h2 class="section-title reveal">Where Scent<br><em>Becomes Identity</em></h2>
+          <h2 class="section-title reveal" data-i18n-html="about.title">Where Scent<br><em>Becomes Identity</em></h2>
 
           <!-- REPLACE: Update the brand quote -->
-          <blockquote class="about-quote reveal">
+          <blockquote class="about-quote reveal" data-i18n="about.quote">
             "Perfume is the art that makes memory speak."
           </blockquote>
 
           <!-- REPLACE: Update brand story paragraphs -->
-          <p class="about-text reveal">
+          <p class="about-text reveal" data-i18n-html="about.text1">
             Born from a passion for olfactory excellence, <strong>LUPI</strong> was founded as a tribute
             to the ancient craft of perfumery — elevated by modern vision and an unwavering
             commitment to quality.
           </p>
-          <p class="about-text reveal reveal-delay-1">
+          <p class="about-text reveal reveal-delay-1" data-i18n="about.text2">
             Each fragrance in our collection begins with a journey: sourcing the rarest ingredients
             from the gardens of Grasse, the spice routes of the East, and the ancient forests of
             the North. Every note is chosen with intention. Every accord composed with precision.
           </p>
-          <p class="about-text reveal reveal-delay-2">
+          <p class="about-text reveal reveal-delay-2" data-i18n="about.text3">
             We believe a fragrance is not merely worn — it is inhabited. It tells the story of
             who you are before you speak a word.
           </p>
@@ -218,15 +222,15 @@
             <!-- REPLACE: Update the three brand pillars / values -->
             <div class="pillar">
               <div class="pillar-icon">◈</div>
-              <div class="pillar-label">Rare Ingredients</div>
+              <div class="pillar-label" data-i18n="about.pillar1">Rare Ingredients</div>
             </div>
             <div class="pillar">
               <div class="pillar-icon">◈</div>
-              <div class="pillar-label">Master Perfumers</div>
+              <div class="pillar-label" data-i18n="about.pillar2">Master Perfumers</div>
             </div>
             <div class="pillar">
               <div class="pillar-icon">◈</div>
-              <div class="pillar-label">Timeless Craft</div>
+              <div class="pillar-label" data-i18n="about.pillar3">Timeless Craft</div>
             </div>
           </div>
 
@@ -245,10 +249,10 @@
     <div class="container">
 
       <div class="section-header reveal">
-        <div class="section-label">The Collection</div>
+        <div class="section-label" data-i18n="products.sectionLabel">The Collection</div>
         <!-- REPLACE: Update section heading and subtitle -->
-        <h2 class="section-title">Curated <em>Fragrances</em></h2>
-        <p class="section-subtitle">Each scent is a chapter. Find yours.</p>
+        <h2 class="section-title" data-i18n-html="products.sectionTitle">Curated <em>Fragrances</em></h2>
+        <p class="section-subtitle" data-i18n="products.sectionSubtitle">Each scent is a chapter. Find yours.</p>
       </div>
 
       <!-- Category tabs — switches between Perfumes / Hand Soap / Room Sprays / Candles -->
@@ -321,15 +325,15 @@
 
           <div class="modal-notes">
             <div class="notes-row">
-              <span class="notes-label">Top Notes</span>
+              <span class="notes-label" data-i18n="products.topNotes">Top Notes</span>
               <span id="modalTopNotes" class="notes-value"></span>
             </div>
             <div class="notes-row">
-              <span class="notes-label">Heart Notes</span>
+              <span class="notes-label" data-i18n="products.heartNotes">Heart Notes</span>
               <span id="modalHeartNotes" class="notes-value"></span>
             </div>
             <div class="notes-row">
-              <span class="notes-label">Base Notes</span>
+              <span class="notes-label" data-i18n="products.baseNotes">Base Notes</span>
               <span id="modalBaseNotes" class="notes-value"></span>
             </div>
           </div>
@@ -354,37 +358,37 @@
 
         <!-- Newsletter -->
         <div class="newsletter-block reveal">
-          <div class="section-label">Stay Close</div>
+          <div class="section-label" data-i18n="newsletter.label">Stay Close</div>
           <!-- REPLACE: Update heading and description -->
-          <h2 class="section-title">The Art of<br><em>Anticipation</em></h2>
-          <p class="newsletter-text">
+          <h2 class="section-title" data-i18n-html="newsletter.title">The Art of<br><em>Anticipation</em></h2>
+          <p class="newsletter-text" data-i18n="newsletter.text">
             Be the first to discover new collections, exclusive launches, and the stories behind
             each fragrance. Join our circle of discerning connoisseurs.
           </p>
           <form class="newsletter-form" id="newsletterForm">
             <!-- REPLACE: Connect this form to your newsletter service (Mailchimp, Klaviyo, etc.) -->
             <div class="newsletter-field">
-              <input type="email" placeholder="Your email address" required class="form-input" id="newsletterEmail">
-              <button type="submit" class="btn btn-primary">Subscribe</button>
+              <input type="email" data-i18n-placeholder="newsletter.emailPlaceholder" placeholder="Your email address" required class="form-input" id="newsletterEmail">
+              <button type="submit" class="btn btn-primary" data-i18n="newsletter.subscribe">Subscribe</button>
             </div>
-            <p class="form-note">We respect your privacy. Unsubscribe at any time.</p>
+            <p class="form-note" data-i18n="newsletter.note">We respect your privacy. Unsubscribe at any time.</p>
           </form>
           <div class="newsletter-success" id="newsletterSuccess">
-            <span>✦ &nbsp;Welcome to the world of LUPI. We'll be in touch.</span>
+            <span data-i18n-html="newsletter.success">✦ &nbsp;Welcome to the world of LUPI. We'll be in touch.</span>
           </div>
         </div>
 
         <!-- Contact form + info -->
         <div class="contact-block reveal reveal-delay-2">
-          <div class="section-label">Get in Touch</div>
-          <h3 class="contact-heading">Questions &amp; Inquiries</h3>
+          <div class="section-label" data-i18n="contact.label">Get in Touch</div>
+          <h3 class="contact-heading" data-i18n="contact.heading">Questions &amp; Inquiries</h3>
 
           <form class="contact-form" id="contactForm">
             <!-- REPLACE: Connect to Formspree, EmailJS, or your own endpoint -->
-            <input  type="text"  placeholder="Your name"    class="form-input" required>
-            <input  type="email" placeholder="Your email"   class="form-input" required>
-            <textarea            placeholder="Your message" class="form-input form-textarea" rows="4" required></textarea>
-            <button type="submit" class="btn btn-outline">Send Message</button>
+            <input  type="text"  data-i18n-placeholder="contact.namePlaceholder"    placeholder="Your name"    class="form-input" required>
+            <input  type="email" data-i18n-placeholder="contact.emailPlaceholder"   placeholder="Your email"   class="form-input" required>
+            <textarea            data-i18n-placeholder="contact.messagePlaceholder" placeholder="Your message" class="form-input form-textarea" rows="4" required></textarea>
+            <button type="submit" class="btn btn-outline" data-i18n="contact.send">Send Message</button>
           </form>
 
           <div class="contact-details">
@@ -423,37 +427,37 @@
           <!-- REPLACE: Brand name and tagline -->
           <span class="logo-text footer-logo">LUPI</span>
           <span class="logo-tagline">Maison de Parfums</span>
-          <p class="footer-desc">Crafted for those who inhabit their fragrance.</p>
+          <p class="footer-desc" data-i18n="footer.tagline">Crafted for those who inhabit their fragrance.</p>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Navigate</h4>
+          <h4 class="footer-heading" data-i18n="footer.navigate">Navigate</h4>
           <ul class="footer-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#products">Collection</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#home"     data-i18n="nav.home">Home</a></li>
+            <li><a href="#about"    data-i18n="nav.about">About</a></li>
+            <li><a href="#products" data-i18n="nav.collection">Collection</a></li>
+            <li><a href="#contact"  data-i18n="nav.contact">Contact</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Collection</h4>
+          <h4 class="footer-heading" data-i18n="footer.collection">Collection</h4>
           <ul class="footer-links">
-            <li><a href="#products">Women</a></li>
-            <li><a href="#products">Men</a></li>
-            <li><a href="#products">Unisex</a></li>
-            <li><a href="#products">Limited Edition</a></li>
+            <li><a href="#products" data-i18n="footer.women">Women</a></li>
+            <li><a href="#products" data-i18n="footer.men">Men</a></li>
+            <li><a href="#products" data-i18n="footer.unisex">Unisex</a></li>
+            <li><a href="#products" data-i18n="footer.limited">Limited Edition</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h4 class="footer-heading">Legal</h4>
+          <h4 class="footer-heading" data-i18n="footer.legal">Legal</h4>
           <ul class="footer-links">
             <!-- REPLACE: Add links to your actual policy pages -->
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Shipping Policy</a></li>
-            <li><a href="#">Returns</a></li>
+            <li><a href="#" data-i18n="footer.privacy">Privacy Policy</a></li>
+            <li><a href="#" data-i18n="footer.terms">Terms of Service</a></li>
+            <li><a href="#" data-i18n="footer.shipping">Shipping Policy</a></li>
+            <li><a href="#" data-i18n="footer.returns">Returns</a></li>
           </ul>
         </div>
 
@@ -462,7 +466,7 @@
       <div class="footer-bottom">
         <!-- REPLACE: Update year and brand name if needed -->
         <p>&copy; 2024 LUPI Maison de Parfums. All rights reserved.</p>
-        <p class="footer-craft">Crafted with intention.</p>
+        <p class="footer-craft" data-i18n="footer.crafted">Crafted with intention.</p>
       </div>
 
     </div>

@@ -460,7 +460,7 @@ async function initPerfumes() {
    script files before main.js. Init order matters.
 ──────────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  LUPI_LANG.init();
+  await LUPI_LANG.init();
   LupiCart.init();
   await LupiAuth.init();
 
