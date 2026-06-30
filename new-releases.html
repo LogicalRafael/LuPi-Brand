@@ -239,6 +239,8 @@
   })();
 
   /* ── Render new releases grid ────────────────────────────── */
+  const _nrCache = {};
+
   async function initNewReleasesPage() {
     const grid = document.getElementById('nrGrid');
     if (!grid) return;
@@ -264,6 +266,8 @@
           }))
         : [];
     }
+
+    products.forEach(p => { _nrCache[p.id] = p; });
 
     grid.innerHTML = products.map((p, i) => {
       const delay   = i > 0 ? ` reveal-delay-${Math.min(i, 5)}` : '';
@@ -347,7 +351,7 @@
       };
     }
 
-    function open(id) {
+    async function open(id) {
       const d = getData(id);
       if (!d) return;
       activeId = id;
@@ -363,6 +367,21 @@
       if (d.imageNode) wrap.appendChild(d.imageNode);
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
+
+      const lang = LUPI_LANG.getLang();
+      if (lang !== 'en' && d.description) {
+        const cached  = _nrCache[id];
+        const i18n    = cached?.description_i18n || {};
+        const srcLang = cached?.description_lang || 'en';
+        const descEl  = document.getElementById('modalDescription');
+        if (i18n[lang]) {
+          descEl.textContent = i18n[lang];
+        } else {
+          LUPI_LANG.translateText(d.description, lang, srcLang).then(translated => {
+            if (activeId === id) descEl.textContent = translated;
+          });
+        }
+      }
     }
 
     function close() {

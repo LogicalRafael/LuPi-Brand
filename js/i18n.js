@@ -901,6 +901,45 @@ const LUPI_LANG = (function () {
     }
   };
 
+  /* ── Description translation (MyMemory API) ────────────── */
+
+  const _trMem = {};
+
+  function _djb2(s) {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h) ^ s.charCodeAt(i);
+    return (h >>> 0).toString(36);
+  }
+
+  async function translateText(text, toLang, fromLang, emailHint) {
+    if (!text || !toLang || toLang === (fromLang || DEFAULT)) return text;
+    const src = fromLang || DEFAULT;
+    const key = `lupi_td:${src}:${toLang}:${_djb2(text)}`;
+
+    if (_trMem[key]) return _trMem[key];
+    try {
+      const ls = localStorage.getItem(key);
+      if (ls) { _trMem[key] = ls; return ls; }
+    } catch {}
+
+    try {
+      let url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${src}|${toLang}`;
+      if (emailHint) url += `&de=${encodeURIComponent(emailHint)}`;
+      const ctrl = new AbortController();
+      const tid  = setTimeout(() => ctrl.abort(), 6000);
+      const res  = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(tid);
+      const data = await res.json();
+      if (data.responseStatus !== 200) throw new Error(data.responseDetails || 'error');
+      const result = data.responseData.translatedText || text;
+      _trMem[key] = result;
+      try { localStorage.setItem(key, result); } catch {}
+      return result;
+    } catch {
+      return text;
+    }
+  }
+
   /* ── Geo detection ──────────────────────────────────────── */
 
   async function detectLang() {
@@ -1002,5 +1041,5 @@ const LUPI_LANG = (function () {
     }
   }
 
-  return { init, t, getLang, setLang, apply };
+  return { init, t, getLang, setLang, apply, translateText };
 })();

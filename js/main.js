@@ -166,6 +166,13 @@ function initFilter() {
 }
 
 
+/* ─── PRODUCT CACHE (for translated descriptions) ────────────── */
+const _productCache = {}; // id → product object
+
+function _cacheProducts(arr) {
+  (arr || []).forEach(p => { _productCache[p.id] = p; });
+}
+
 /* ─── PRODUCT MODAL ──────────────────────────────────────────── */
 let openProductModal; // exposed so dynamically rendered cards can call it
 
@@ -195,7 +202,7 @@ let openProductModal; // exposed so dynamically rendered cards can call it
     };
   }
 
-  function open(id) {
+  async function open(id) {
     const d = getData(id);
     if (!d) return;
     activeId = id;
@@ -214,6 +221,22 @@ let openProductModal; // exposed so dynamically rendered cards can call it
 
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
+
+    /* Translate description if the current language is not the source */
+    const lang = LUPI_LANG.getLang();
+    if (lang !== 'en' && d.description) {
+      const cached      = _productCache[id];
+      const i18n        = cached?.description_i18n || {};
+      const srcLang     = cached?.description_lang || 'en';
+      const descEl      = document.getElementById('modalDescription');
+      if (i18n[lang]) {
+        descEl.textContent = i18n[lang];
+      } else {
+        LUPI_LANG.translateText(d.description, lang, srcLang).then(translated => {
+          if (activeId === id) descEl.textContent = translated;
+        });
+      }
+    }
   }
 
   openProductModal = open; // expose globally
@@ -322,6 +345,7 @@ async function initPerfumes() {
     products = (typeof PERFUMES_FALLBACK !== 'undefined') ? PERFUMES_FALLBACK : [];
   }
 
+  _cacheProducts(products);
   const DELAYS = ['', ' reveal-delay-1', ' reveal-delay-2', ' reveal-delay-3', ' reveal-delay-4', ' reveal-delay-5'];
   grid.innerHTML = products.map((p, i) => renderProductCard(p, DELAYS[i] || '', '')).join('');
 
@@ -426,6 +450,7 @@ async function initPerfumes() {
       }));
     }
 
+    _cacheProducts(products);
     const svgKey = map.dbType; // 'handsoap' | 'roomspray' | 'candle'
     grid.innerHTML = products.map((p, i) =>
       renderProductCard(p, DELAYS[i] || '', CAT_SVG[svgKey] || '')

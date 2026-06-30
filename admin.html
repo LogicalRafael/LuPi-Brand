@@ -153,6 +153,30 @@
             <textarea id="fieldDescription" class="form-textarea" rows="4" placeholder="Fragrance description…"></textarea>
           </div>
         </div>
+        <div class="form-row" style="gap:10px;align-items:flex-end;margin-top:-4px">
+          <div class="form-group" style="flex:0 0 auto">
+            <label class="form-label" for="fieldDescLang">Written in</label>
+            <select id="fieldDescLang" class="form-select" style="width:140px">
+              <option value="en">English</option>
+              <option value="pt">Português</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="it">Italiano</option>
+              <option value="el">Ελληνικά</option>
+              <option value="ru">Русский</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:0 0 auto">
+            <button type="button" id="autoTranslateBtn" class="btn-row btn-row-edit"
+                    style="height:36px;padding:0 14px;white-space:nowrap;margin-top:22px">
+              🌐 Auto-translate
+            </button>
+          </div>
+          <div class="form-group" style="flex:1">
+            <span id="translateStatus" style="font-size:0.65rem;color:var(--text-muted);display:block;margin-top:28px"></span>
+          </div>
+        </div>
 
         <!-- Fragrance Notes -->
         <div class="form-section-title">Fragrance Notes</div>
@@ -252,6 +276,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/lupi-db.js"></script>
 
   <script>
@@ -278,8 +303,10 @@
   /* ── State ────────────────────────────────────────────────── */
   let _products    = [];
   let _filter      = 'all';
-  let _editingId   = null; // null = adding new
+  let _editingId   = null;
   let _pendingDeleteId = null;
+  let _descI18n    = {};
+  let _adminEmail  = '';
   const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   /* ── Auth guard ───────────────────────────────────────────── */
@@ -289,6 +316,7 @@
       window.location.replace('index.html');
       return false;
     }
+    _adminEmail = session.user.email || '';
     document.getElementById('adminUserName').textContent =
       session.user.user_metadata?.name || session.user.email;
     return true;
@@ -495,6 +523,11 @@
     document.getElementById('fieldSortOrder').value    = p.sort_order   ?? 0;
     document.getElementById('imageFile').value         = '';
     document.getElementById('uploadProgress').style.display = 'none';
+    _descI18n = { ...(p.description_i18n || {}) };
+    const descLangEl = document.getElementById('fieldDescLang');
+    if (descLangEl) descLangEl.value = p.description_lang || 'en';
+    const statusEl = document.getElementById('translateStatus');
+    if (statusEl) statusEl.textContent = '';
 
     updateSwatches();
     renderImagePreview(p);
@@ -510,8 +543,10 @@
       category:       document.getElementById('fieldCategory').value.trim(),
       badge:          document.getElementById('fieldBadge').value.trim() || null,
       category_label: document.getElementById('fieldCategoryLabel').value.trim(),
-      description:    document.getElementById('fieldDescription').value.trim(),
-      top_notes:      document.getElementById('fieldTopNotes').value.trim(),
+      description:      document.getElementById('fieldDescription').value.trim(),
+      description_i18n: { ..._descI18n },
+      description_lang: document.getElementById('fieldDescLang')?.value || 'en',
+      top_notes:        document.getElementById('fieldTopNotes').value.trim(),
       heart_notes:    document.getElementById('fieldHeartNotes').value.trim(),
       base_notes:     document.getElementById('fieldBaseNotes').value.trim(),
       color:          document.getElementById('fieldColor').value.trim(),
@@ -520,6 +555,36 @@
       sort_order:     parseInt(document.getElementById('fieldSortOrder').value) || 0,
     };
   }
+
+  /* ── Auto-translate descriptions ─────────────────────────── */
+  async function autoTranslateDescriptions() {
+    const text = document.getElementById('fieldDescription').value.trim();
+    if (!text) { toast('Write a description first.', 'error'); return; }
+
+    const srcLang  = document.getElementById('fieldDescLang')?.value || 'en';
+    const statusEl = document.getElementById('translateStatus');
+    const btn      = document.getElementById('autoTranslateBtn');
+    const LANGS    = ['en', 'pt', 'es', 'fr', 'de', 'it', 'el', 'ru'];
+    const targets  = LANGS.filter(l => l !== srcLang);
+
+    btn.disabled = true;
+    statusEl.textContent = 'Translating…';
+
+    let done = 0;
+    for (const toLang of targets) {
+      try {
+        const result = await LUPI_LANG.translateText(text, toLang, srcLang, _adminEmail);
+        if (result && result !== text) _descI18n[toLang] = result;
+      } catch {}
+      done++;
+      statusEl.textContent = `Translating… ${done}/${targets.length}`;
+    }
+
+    btn.disabled = false;
+    statusEl.textContent = `✓ Translated to ${targets.length} languages. Save to apply.`;
+  }
+
+  document.getElementById('autoTranslateBtn').addEventListener('click', autoTranslateDescriptions);
 
   /* ── Color swatches ───────────────────────────────────────── */
   function updateSwatches() {
